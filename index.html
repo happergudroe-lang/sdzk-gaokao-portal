@@ -410,45 +410,47 @@ body.xj-lock{overflow:hidden}
       a(sheen, [{ opacity: 0 }], { duration: 1 });
       skip.style.display = 'none'; return;
     }
-    /* 权威电动节奏 V3（有限动画总时长约 5.65s）：上下鎏金界线 → 光晕/光线 → 金印徽记 → 主标题中线撑开 → 鎏金扫光 → 金线 → 副标题 → CTA → 底注；
+    /* 权威电动节奏 V4（iOS 级联瀑布式，有限动画总时长约 2.7s）：
+       Apple 流畅感要诀 = 元素错峰并行启动、绝不排队等上一幕走完；临界阻尼缓动（无回弹）显快且稳。
+       界线/光晕(0s) → 徽记(0.35s) → 标题(0.6s) → 扫光/金线(1.3s) → 副标题(1.65s) → CTA(1.95s) → 底注(2.15s)；
        光晕与 CTA 之后进入极缓呼吸循环（仅 transform，合成器，不掉帧） */
     a(beamT, [
       { opacity: 0, transform: 'scaleX(0)' },
       { opacity: .9, transform: 'scaleX(1)', offset: .7 },
       { opacity: .5, transform: 'scaleX(1)' }
-    ], { duration: 1400, delay: 250, easing: 'ease-out' });
+    ], { duration: 1100, easing: 'ease-out' });
     a(beamB, [
       { opacity: 0, transform: 'scaleX(0)' },
       { opacity: .9, transform: 'scaleX(1)', offset: .7 },
       { opacity: .5, transform: 'scaleX(1)' }
-    ], { duration: 1400, delay: 480, easing: 'ease-out' });
-    a(glow, [{ opacity: 0 }, { opacity: 1 }], { duration: 2600, easing: 'ease-out' });
+    ], { duration: 1100, delay: 120, easing: 'ease-out' });
+    a(glow, [{ opacity: 0 }, { opacity: 1 }], { duration: 1600, easing: 'ease-out' });
     a(glow, [{ transform: 'scale(1)' }, { transform: 'scale(1.05)' }, { transform: 'scale(1)' }],
-      { duration: 6000, delay: 2600, iterations: Infinity, easing: 'ease-in-out' });
+      { duration: 6000, delay: 1600, iterations: Infinity, easing: 'ease-in-out' });
     a(light, [
       { opacity: 0, transform: 'scaleX(0)' },
       { opacity: .95, transform: 'scaleX(1)', offset: .35 },
       { opacity: .22, transform: 'scaleX(1)' }
-    ], { duration: 2200, delay: 400, easing: 'ease-out' });
+    ], { duration: 1400, delay: 150, easing: 'ease-out' });
     a(crest, [
       { opacity: 0, transform: 'scale(.5) rotate(-24deg)' },
       { opacity: 1, transform: 'scale(1) rotate(0deg)' }
-    ], { duration: 900, delay: 950, easing: E1 });
+    ], { duration: 650, delay: 350, easing: E1 });
     a(title, [
       { opacity: 0, transform: 'scaleY(.04) scaleX(1.03)' },
       { opacity: 1, transform: 'scaleY(1) scaleX(1)' }
-    ], { duration: 1400, delay: 1250, easing: E1 });
+    ], { duration: 850, delay: 600, easing: E1 });
     a(sheen, [
       { opacity: 0, transform: 'translateX(-170%) skewX(-14deg)' },
       { opacity: .9, transform: 'translateX(20%) skewX(-14deg)', offset: .45 },
       { opacity: 0, transform: 'translateX(190%) skewX(-14deg)' }
-    ], { duration: 950, delay: 2560, easing: 'cubic-bezier(.4,0,.2,1)' });
-    a(rule, [{ opacity: 0, transform: 'scaleX(0)' }, { opacity: 1, transform: 'scaleX(1)' }], { duration: 900, delay: 2900, easing: E1 });
-    a(sub, [{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 900, delay: 3800, easing: E1 });
-    var last = a(cta, [{ opacity: 0, transform: 'translateY(12px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 800, delay: 4650, easing: E1 });
+    ], { duration: 700, delay: 1300, easing: 'cubic-bezier(.4,0,.2,1)' });
+    a(rule, [{ opacity: 0, transform: 'scaleX(0)' }, { opacity: 1, transform: 'scaleX(1)' }], { duration: 650, delay: 1400, easing: E1 });
+    a(sub, [{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 600, delay: 1650, easing: E1 });
+    var last = a(cta, [{ opacity: 0, transform: 'translateY(12px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 650, delay: 1950, easing: E1 });
     a(cta, [{ transform: 'scale(1)' }, { transform: 'scale(1.014)' }, { transform: 'scale(1)' }],
-      { duration: 3800, delay: 5500, iterations: Infinity, easing: 'ease-in-out' });
-    a(note, [{ opacity: 0 }, { opacity: 1 }], { duration: 700, delay: 4900, easing: 'ease-out' });
+      { duration: 5000, delay: 2650, iterations: Infinity, easing: 'ease-in-out' });
+    a(note, [{ opacity: 0 }, { opacity: 1 }], { duration: 550, delay: 2150, easing: 'ease-out' });
     last.finished.then(function () { skip.style.display = 'none'; }).catch(function () {});
   }
 
