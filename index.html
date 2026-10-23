@@ -312,8 +312,8 @@ body.xj-lock{overflow:hidden}
 .xj-stage{position:relative;width:100%;height:100%;display:grid;place-items:center;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 .xj-glow{position:absolute;left:50%;top:50%;width:90vmin;height:90vmin;margin:-45vmin 0 0 -45vmin;border-radius:50%;background:radial-gradient(closest-side,rgba(207,169,90,.13),rgba(148,158,178,.09) 45%,rgba(148,158,178,0) 72%);opacity:0;will-change:opacity;pointer-events:none}
 /* V3：权威元素 —— 金印徽记 / 上下鎏金界线 */
-.xj-crest{width:42px;height:42px;margin-bottom:30px;border:1px solid rgba(207,169,90,.6);border-radius:50%;display:grid;place-items:center;opacity:0;will-change:transform,opacity;pointer-events:none}
-.xj-crest i{display:block;width:7px;height:7px;background:var(--xj-gold);transform:rotate(45deg);box-shadow:0 0 0 4px rgba(207,169,90,.14)}
+.xj-crest{width:54px;height:54px;margin-bottom:30px;opacity:0;will-change:transform,opacity;pointer-events:none}
+.xj-crest svg{display:block;width:100%;height:100%}
 .xj-beam{position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(207,169,90,.75) 30%,rgba(207,169,90,.9) 50%,rgba(207,169,90,.75) 70%,transparent);transform:scaleX(0);opacity:0;will-change:transform,opacity;pointer-events:none}
 .xj-beam.t{top:calc(env(safe-area-inset-top,0px) + 34px)}
 .xj-beam.b{bottom:calc(env(safe-area-inset-bottom,0px) + 34px)}
@@ -346,7 +346,20 @@ body.xj-lock{overflow:hidden}
     <div class="xj-beam t" aria-hidden="true"></div>
     <div class="xj-beam b" aria-hidden="true"></div>
     <div class="xj-lockup">
-      <div class="xj-crest" aria-hidden="true"><i></i></div>
+      <div class="xj-crest" aria-hidden="true">
+        <!-- 金印 Logo：双环 + 「杰」字铭文（印章式） -->
+        <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="28" cy="28" r="26.5" stroke="#cfa95a" stroke-opacity=".75" stroke-width="1.2"/>
+          <circle cx="28" cy="28" r="22" stroke="#cfa95a" stroke-opacity=".35" stroke-width="1"/>
+          <circle cx="28" cy="5.5" r="1.3" fill="#cfa95a" fill-opacity=".9"/>
+          <circle cx="50.5" cy="28" r="1.3" fill="#cfa95a" fill-opacity=".9"/>
+          <circle cx="28" cy="50.5" r="1.3" fill="#cfa95a" fill-opacity=".9"/>
+          <circle cx="5.5" cy="28" r="1.3" fill="#cfa95a" fill-opacity=".9"/>
+          <text x="28" y="29.5" text-anchor="middle" dominant-baseline="central"
+                font-family="'Kaiti SC','STKaiti','KaiTi','Songti SC','SimSun',serif"
+                font-size="22" font-weight="700" fill="#cfa95a">杰</text>
+        </svg>
+      </div>
       <h1 class="xj-title" aria-label="山东高考报名助手"><span aria-hidden="true">山东高考报名助手</span></h1>
       <div class="xj-rule"></div>
       <div class="xj-sub">小杰 · 技术支持</div>
