@@ -31,7 +31,7 @@ const BASE = 'http://127.0.0.1:8971';
   /* 第二轮：全新会话截图关键帧 */
   const p2 = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
   await p2.goto(BASE + '/', { waitUntil: 'domcontentloaded' });
-  const shots = [[2400, 'v3-beams'], [7000, 'v3-crest-title'], [12500, 'v3-sheen'], [17500, 'v3-sub'], [25000, 'v3-cta']];
+  const shots = [[2400, 'v3-beams'], [7000, 'v3-crest-title'], [12500, 'v3-sheen'], [17600, 'v3-sub'], [25900, 'v3-cta']];
   let prev = 0;
   for (const [ms, name] of shots) {
     await p2.waitForTimeout(ms - prev); prev = ms;

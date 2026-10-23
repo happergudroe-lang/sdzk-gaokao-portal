@@ -71,8 +71,8 @@ function computeCheck(first17) {
       if (s.textContent.indexOf('黑马') < 0 && (document.querySelector('.xj-tw1').getAttribute('data-text') || '').indexOf('黑马') < 0) throw new Error('铭言缺失');
       if (s.textContent.indexOf('三年中专一场空') < 0 || s.textContent.indexOf('开玩笑的') < 0) throw new Error('打工自嘲段缺失');
       if (s.textContent.indexOf('把选择权拿回自己手里') < 0) throw new Error('鼓励段缺失');
-      if (s.textContent.indexOf('Node.js') < 0 || s.textContent.indexOf('AES-256-GCM') < 0) throw new Error('技术字幕缺失');
-      if (s.textContent.indexOf('小杰科技') < 0 || s.textContent.indexOf('考的都会') < 0) throw new Error('祝愿段缺失');
+      if (s.textContent.indexOf('Node.js') < 0 || s.textContent.indexOf('AES-256-GCM') < 0 || s.textContent.indexOf('VAPID') < 0) throw new Error('技术字幕缺失');
+      if (s.textContent.indexOf('小杰科技') < 0 || s.textContent.indexOf('考的都会') < 0 || s.textContent.indexOf('顶峰相见') < 0) throw new Error('祝愿段缺失');
       if (!document.getElementById('xjCd') || !document.getElementById('xjCdCap')) throw new Error('实时倒计时缺失');
       if (document.querySelector('.xj-title').getAttribute('aria-label').indexOf('山东高考报名助手') < 0) throw new Error('主标题缺少项目名');
       if (document.querySelector('.xj-sub').textContent.indexOf('小杰') < 0) throw new Error('副标题缺少技术支持方');
