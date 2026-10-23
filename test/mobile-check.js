@@ -27,6 +27,28 @@ const BASE = process.env.BASE || 'http://127.0.0.1:8971';
   console.log('fields scrollY=' + y1);
   await p.waitForTimeout(800);
   await p.screenshot({ path: 'assets/m-fields.png' });
+  /* 志愿 tab：教学 + 大学图鉴 */
+  await p.evaluate(() => {
+    const seg = document.getElementById('seg');
+    if (typeof setView === 'function') setView('plan', seg.querySelector('[data-v="plan"]'));
+    window.scrollTo(0, 0);
+  });
+  await p.waitForTimeout(600);
+  await p.screenshot({ path: 'assets/m-plan.png' });
+  await p.evaluate(() => {
+    const g = [...document.querySelectorAll('#v-plan .group-hd')].find(x => x.textContent.indexOf('顶流大学') >= 0);
+    if (g) g.scrollIntoView({ block: 'start', behavior: 'instant' });
+  });
+  await p.waitForTimeout(500);
+  await p.screenshot({ path: 'assets/m-plan2.png' });
+  /* v-info 顶部总览 */
+  await p.evaluate(() => {
+    const seg = document.getElementById('seg');
+    setView('info', seg.querySelector('[data-v="info"]'));
+    window.scrollTo(0, 0);
+  });
+  await p.waitForTimeout(600);
+  await p.screenshot({ path: 'assets/m-info-top.png' });
   await browser.close();
   console.log('手机截图完成');
 })().catch(e => { console.error(e); process.exit(1); });

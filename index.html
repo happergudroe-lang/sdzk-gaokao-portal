@@ -171,6 +171,29 @@ a.credit-owner:hover,a.credit-name:hover{text-decoration:underline}
   .wrap .row .vl{margin-left:0;text-align:left;flex:none;width:100%}
   .wrap .row .sub{margin:0}
 }
+/* ---------- 志愿 tab 组件（GitHub Primer Timeline / Badge 开源模式） ---------- */
+.tl{margin:4px 16px 12px}
+.tl-item{position:relative;display:flex;gap:12px;padding:9px 0}
+.tl-item::before{content:'';position:absolute;left:14px;top:0;bottom:0;width:2px;background:var(--sep)}
+.tl-item:first-child::before{top:18px}
+.tl-item:last-child::before{height:18px;bottom:auto}
+.tl-dot{flex:none;width:28px;height:28px;border-radius:50%;background:var(--card);border:2px solid var(--blue);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;position:relative;z-index:1}
+.tl-item.ok .tl-dot{border-color:var(--green);color:var(--green)}
+.tl-item.warn .tl-dot{border-color:var(--orange);color:var(--orange)}
+.tl-bd{flex:1;min-width:0;padding-top:3px}
+.tl-t{font-size:15px;font-weight:600;letter-spacing:-.01em}
+.tl-d{font-size:13px;line-height:19px;color:var(--label-2);margin-top:3px}
+.tl-d a{color:var(--blue)}
+.badges{display:flex;flex-wrap:wrap;gap:7px;padding:6px 16px 14px}
+.badge{font-size:12.5px;line-height:1;padding:8px 12px;border-radius:999px;background:rgba(120,120,128,.12);color:var(--label);font-weight:500;white-space:nowrap}
+:root[data-theme="dark"] .badge{background:rgba(120,120,128,.26)}
+.badge.gold{color:#9a6b1f;font-weight:600}
+:root[data-theme="dark"] .badge.gold{color:var(--gold,#cfa95a)}
+.badge.fake{color:var(--red);font-weight:600;text-decoration:line-through;text-decoration-thickness:1px}
+.mini-tl{margin:2px 16px 12px}
+.mini-tl .tl-item{padding:5px 0}
+.mini-tl .tl-t{font-size:14px}
+.mini-tl .tl-d{font-size:12.5px;line-height:18px}
 .note{margin:0 16px 16px;padding:12px 14px;border-radius:10px;background:var(--fill);font-size:14px;line-height:20px}
 .note.warn{background:rgba(255,149,0,.14)}
 .note b{font-weight:600}
@@ -729,6 +752,7 @@ body.xj-lock{overflow:hidden}
     <button data-v="info" onclick="setView('info',this)">信息</button>
     <button data-v="links" onclick="setView('links',this)">入口</button>
     <button data-v="prep" onclick="setView('prep',this)">准备</button>
+    <button data-v="plan" onclick="setView('plan',this)">志愿</button>
   </div>
 
   <!-- ============ 状态 ============ -->
@@ -794,6 +818,15 @@ body.xj-lock{overflow:hidden}
   <!-- ============ 信息（一键填写数据卡） ============ -->
   <section class="view" id="v-info">
     <div class="group rise">
+      <div class="group-hd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>这一页怎么用 · 30 秒看懂</div>
+      <div class="tl">
+        <div class="tl-item"><div class="tl-dot">1</div><div class="tl-bd"><div class="tl-t">填好本页资料</div><div class="tl-d">在下方「我的报名信息」逐项填写，点「检查资料完整性」直到全部 ✓</div></div></div>
+        <div class="tl-item"><div class="tl-dot">2</div><div class="tl-bd"><div class="tl-t">留一份备份</div><div class="tl-d">点「复制报名数据」导出 JSON 存好 —— 手机换了自己也能照着填</div></div></div>
+        <div class="tl-item ok"><div class="tl-dot">3</div><div class="tl-bd"><div class="tl-t">开闸日进官网照抄</div><div class="tl-d">报名日 9:00–18:00 打开官网，照「字段对照卡」逐项填；认证、提交、缴费由你手动完成</div></div></div>
+      </div>
+    </div>
+
+    <div class="group rise">
       <div class="group-hd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"/></svg>我的报名信息<span class="rt">只存本机，不上传</span></div>
       <div class="fld"><label>姓名 *</label><input id="f-name" placeholder="与身份证一致"></div>
       <div class="fld"><label>身份证号 *</label><input id="f-idcard" maxlength="18" placeholder="18 位"><div class="hint" id="idcHint">填写后自动推导出生日期与性别</div></div>
@@ -850,11 +883,13 @@ body.xj-lock{overflow:hidden}
 
     <div class="group rise">
       <div class="group-hd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l9 4.9v10.2L12 22l-9-4.9V6.9z"/><path d="M12 22V12"/><path d="M12 12L3 6.9"/><path d="M12 12l9-5.1"/></svg>进入官方报名 · 五步走（开闸日 9:00–18:00）</div>
-      <div class="row"><div class="lb big">① 备资料</div><div class="sub">本页「信息」区填好并「检查资料完整性」</div></div>
-      <div class="row"><div class="lb big">② 留底</div><div class="sub">点「复制报名数据」导出 JSON 备份（可粘贴给家人核对）</div></div>
-      <div class="row"><div class="lb big">③ 进官网</div><div class="sub"><a href="https://wsbm.sdzk.cn" target="_blank" rel="noopener" style="color:var(--blue)">点此直达 wsbm.sdzk.cn</a>（或用「入口」页磁贴）</div></div>
-      <div class="row"><div class="lb big">④ 对照填</div><div class="sub">照上面的字段对照卡逐项填写；本页可悬浮分屏对照</div></div>
-      <div class="row"><div class="lb big">⑤ 人工确认并提交</div><div class="sub">认证、照片核验、最终确认、缴费 —— 全部由你手动完成</div></div>
+      <div class="tl">
+        <div class="tl-item"><div class="tl-dot">①</div><div class="tl-bd"><div class="tl-t">备资料</div><div class="tl-d">本页「信息」区填好并「检查资料完整性」</div></div></div>
+        <div class="tl-item"><div class="tl-dot">②</div><div class="tl-bd"><div class="tl-t">留底</div><div class="tl-d">点「复制报名数据」导出 JSON 备份（可粘贴给家人核对）</div></div></div>
+        <div class="tl-item"><div class="tl-dot">③</div><div class="tl-bd"><div class="tl-t">进官网</div><div class="tl-d"><a href="https://wsbm.sdzk.cn" target="_blank" rel="noopener">点此直达 wsbm.sdzk.cn</a>（或用「入口」页磁贴）</div></div></div>
+        <div class="tl-item"><div class="tl-dot">④</div><div class="tl-bd"><div class="tl-t">对照填</div><div class="tl-d">照上面的字段对照卡逐项填写；本页可悬浮分屏对照</div></div></div>
+        <div class="tl-item ok"><div class="tl-dot">⑤</div><div class="tl-bd"><div class="tl-t">人工确认并提交</div><div class="tl-d">认证、照片核验、最终确认、缴费 —— 全部由你手动完成</div></div></div>
+      </div>
       <div class="note" style="margin:2px 16px 16px"><b>如实说明（重要）：</b>浏览器安全边界决定了<b>普通网页无法替你在官网页面上自动填写</b>——官网是另一个域名，页面之间不允许互相操作（同源策略），任何声称"网页一键跨站自动填表"的实现都不可信。本站正式交付方案是：<b>核验入口直达 + 资料完整性检查 + 字段对照卡 + 逐项复制</b>——不装任何东西，全平台可用。</div>
     </div>
   </section>
@@ -919,6 +954,54 @@ body.xj-lock{overflow:hidden}
         <b>③ 春季与夏季同时报考须分别缴费。</b><br>
         拟参加高职（专科）单独考试招生的，需在 11月13日—15日（9:00–18:00）缴春季高考技能测试费。
       </div>
+    </div>
+  </section>
+
+  <!-- ============ 志愿（填报教学 + 大学图鉴） ============ -->
+  <section class="view" id="v-plan">
+    <div class="group rise">
+      <div class="group-hd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1l1-4z"/></svg>志愿怎么填 · 六步走（先了解，出分后照做）</div>
+      <div class="tl">
+        <div class="tl-item"><div class="tl-dot">1</div><div class="tl-bd"><div class="tl-t">出分先查「位次」</div><div class="tl-d">省招考院官网会发布「一分一段表」—— 你的全省排名。位次比分数靠谱，报志愿全程看位次。</div></div></div>
+        <div class="tl-item"><div class="tl-dot">2</div><div class="tl-bd"><div class="tl-t">用位次圈定范围</div><div class="tl-d">把你的位次对照近三年各校「投档位次」，上下浮动 10% 左右的学校专业都列出来。</div></div></div>
+        <div class="tl-item"><div class="tl-dot">3</div><div class="tl-bd"><div class="tl-t">冲稳保排梯度</div><div class="tl-d">夏季高考常规批 96 个志愿（专业+学校模式），大致「冲 30 / 稳 40 / 保 26」，保底志愿务必稳。</div></div></div>
+        <div class="tl-item"><div class="tl-dot">4</div><div class="tl-bd"><div class="tl-t">逐条核对招生章程</div><div class="tl-d">单科成绩要求、体检限制、外语语种 —— 都在学校官网《招生章程》里，不符合的别填。</div></div></div>
+        <div class="tl-item"><div class="tl-dot">5</div><div class="tl-bd"><div class="tl-t">官网规定时间填报</div><div class="tl-d">只在省招考院官网（wsbm.sdzk.cn）填报；账号密码保管好，志愿以最后一次提交为准。</div></div></div>
+        <div class="tl-item ok"><div class="tl-dot">6</div><div class="tl-bd"><div class="tl-t">提交后复核留存</div><div class="tl-d">重新登录检查每一条志愿，截图保存 —— 录取查询也用同一系统。</div></div></div>
+      </div>
+      <div class="note" style="margin:0 16px 16px"><b>春季高考</b>：在本人报考的专业类别内填报，规则以当年官方文件为准；<b>警惕</b>：不存在「内部指标」「花钱补录」，志愿只有一个入口 —— 省招考院官网。</div>
+    </div>
+
+    <div class="group rise">
+      <div class="group-hd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 6.2L21 9l-5 4.4L17.5 20 12 16.5 6.5 20 8 13.4 3 9l6.6-.8z"/></svg>顶流大学 · 梯队图鉴</div>
+      <div class="mini-tl">
+        <div class="tl-item"><div class="tl-dot" style="border-color:var(--orange);color:var(--orange)">C9</div><div class="tl-bd"><div class="tl-t">C9 联盟（中国版常春藤 · 塔尖九校）</div></div></div>
+        <div class="tl-item warn"><div class="tl-dot">985</div><div class="tl-bd"><div class="tl-t">985 中坚 · 顶级综合与行业名校</div></div></div>
+        <div class="tl-item"><div class="tl-dot">211</div><div class="tl-bd"><div class="tl-t">211 / 双一流 · 行业顶尖学科</div></div></div>
+      </div>
+      <div class="badges">
+        <span class="badge gold">清华大学</span><span class="badge gold">北京大学</span><span class="badge gold">复旦大学</span><span class="badge gold">上海交通大学</span><span class="badge gold">浙江大学</span><span class="badge gold">中国科学技术大学</span><span class="badge gold">南京大学</span><span class="badge gold">哈尔滨工业大学</span><span class="badge gold">西安交通大学</span>
+      </div>
+      <div class="badges" style="padding-top:0">
+        <span class="badge">中国人民大学</span><span class="badge">北京航空航天大学</span><span class="badge">北京理工大学</span><span class="badge">北京师范大学</span><span class="badge">武汉大学</span><span class="badge">华中科技大学</span><span class="badge">中山大学</span><span class="badge">厦门大学</span><span class="badge">东南大学</span><span class="badge">同济大学</span><span class="badge">天津大学</span><span class="badge">南开大学</span><span class="badge">四川大学</span><span class="badge">电子科技大学</span><span class="badge">华南理工大学</span><span class="badge">山东大学</span><span class="badge">中国海洋大学</span><span class="badge">国防科技大学</span>
+      </div>
+      <div class="badges" style="padding-top:0">
+        <span class="badge">中央财经大学</span><span class="badge">上海财经大学</span><span class="badge">对外经济贸易大学</span><span class="badge">北京邮电大学</span><span class="badge">西安电子科技大学</span><span class="badge">中国政法大学</span><span class="badge">北京外国语大学</span><span class="badge">哈尔滨工程大学</span><span class="badge">南京航空航天大学</span>
+      </div>
+      <div class="note" style="margin:0 16px 16px">山东本地的主力梯队：<b>山东大学</b>（985）、<b>中国海洋大学</b>（985）、<b>哈尔滨工业大学（威海）</b>、<b>中国石油大学（华东）</b>（211），以及山东师范大学、青岛大学、山东科技大学、青岛科技大学、济南大学、齐鲁工业大学、山东第一医科大学、烟台大学等省属骨干。梯队不分先后，录取分每年浮动，一切以当年官方招生计划为准。</div>
+    </div>
+
+    <div class="group rise">
+      <div class="group-hd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86l-8.486 14.686a1.5 1.5 0 0 0 1.29 2.25h16.914a1.5 1.5 0 0 0 1.29 -2.25l-8.485 -14.686a1.5 1.5 0 0 0 -2.582 0z"/></svg>野鸡大学避坑名单（划线的都是假的）</div>
+      <div class="badges">
+        <span class="badge fake">中国邮电大学</span><span class="badge fake">中国经济贸易大学</span><span class="badge fake">中国科技管理学院</span><span class="badge fake">北京经济贸易大学</span><span class="badge fake">北京国际金融学院</span><span class="badge fake">上海经济贸易大学</span><span class="badge fake">上海工商学院</span><span class="badge fake">山东邮电大学</span><span class="badge fake">山东经济贸易大学</span><span class="badge fake">首都财贸管理大学</span><span class="badge fake">广东科技管理大学</span><span class="badge fake">南京工商大学</span>
+      </div>
+      <div class="mini-tl" style="margin-top:8px">
+        <div class="tl-item warn"><div class="tl-dot">1</div><div class="tl-bd"><div class="tl-t">查域名</div><div class="tl-d">正规高校官网都是 <b>.edu.cn</b> 域名（教育部统一注册），野鸡大学常用 .com / .cn 套壳仿冒。</div></div></div>
+        <div class="tl-item warn"><div class="tl-dot">2</div><div class="tl-bd"><div class="tl-t">查名单</div><div class="tl-d">教育部官网（moe.gov.cn）每年公布「虚假大学名单」，累计已曝光 400 余所，录取通知来了先去查。</div></div></div>
+        <div class="tl-item ok"><div class="tl-dot">3</div><div class="tl-bd"><div class="tl-t">查代码</div><div class="tl-d">填志愿时在官方系统里<b>搜得到</b>的才是教育部认可的学校 —— 搜不到却给你发「录取通知书」的，直接扔。</div></div></div>
+      </div>
+      <div class="note" style="margin:0 16px 16px">以上为媒体广泛曝光的部分示例，<b>完整名单以教育部最新公布为准</b>：教育部官网（www.moe.gov.cn）搜索「虚假大学」。共同特征：名字蹭名牌、承诺包过、缴费就发录取通知。</div>
     </div>
   </section>
 
@@ -1345,7 +1428,7 @@ function setView(name, btn){
   btns.forEach(function(b,i){ b.classList.toggle('on', b===btn); if (b===btn) idx=i; });
   var w = segLayout(); thumb.style.width = w+'px';
   if (RM) thumbX.jump(idx*w); else { thumbX.to(idx*w); kick(); }
-  ['status','info','links','prep'].forEach(function(v){
+  ['status','info','links','prep','plan'].forEach(function(v){
     var el = $('v-'+v); el.classList.remove('on');
     if (v===name){ void el.offsetWidth; el.classList.add('on'); riseIn(el); }
   });

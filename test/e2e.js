@@ -125,6 +125,23 @@ function computeCheck(first17) {
     await ctx2.close();
   });
 
+  await t('志愿 tab：填报六步走 / 顶流大学梯队 / 野鸡大学避坑名单齐全（开源 Primer timeline 模式）', () => {
+    return page.evaluate(() => {
+      const seg = document.getElementById('seg');
+      if (seg.querySelectorAll('button').length !== 5) throw new Error('应为 5 个 tab');
+      setView('plan', seg.querySelector('[data-v="plan"]'));
+      const v = document.getElementById('v-plan');
+      if (!v.classList.contains('on')) throw new Error('志愿 tab 未激活');
+      const t = v.textContent;
+      ['一分一段', '冲稳保', '96 个志愿', '招生章程'].forEach(k => { if (t.indexOf(k) < 0) throw new Error('志愿教学缺: ' + k); });
+      ['C9 联盟', '清华大学', '山东大学', '中国海洋大学'].forEach(k => { if (t.indexOf(k) < 0) throw new Error('顶流名单缺: ' + k); });
+      if (v.querySelectorAll('.badge.fake').length < 10) throw new Error('野鸡大学示例不足 10 所');
+      ['查域名', '.edu.cn', '虚假大学', 'moe.gov.cn'].forEach(k => { if (t.indexOf(k) < 0) throw new Error('识别法缺: ' + k); });
+      if (v.querySelectorAll('.tl-item').length < 9) throw new Error('timeline 结构缺失');
+      setView('status', seg.querySelector('[data-v="status"]'));
+    });
+  });
+
   await t('无 console error', () => {
     const fatal = consoleErrors.filter(e => !/net::|Failed to load resource|wsbm\.sdzk\.cn|navigator\.vibrate|ch chromestatus/.test(e));
     assert.deepStrictEqual(fatal, [], 'console errors: ' + fatal.join(' | '));
