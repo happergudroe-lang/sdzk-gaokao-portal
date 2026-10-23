@@ -55,20 +55,22 @@ function computeCheck(first17) {
       if (!document.querySelector('.xj-btn') || document.querySelector('.xj-btn').textContent.indexOf('开始报名') < 0) throw new Error('CTA 按钮缺失');
     });
   });
-  await t('节奏合规：入场有限动画总时长 ≤ 11.5s（读 WAAPI 时序实测，呼吸循环除外）', () => {
+  await t('节奏合规：入场有限动画总时长 ≤ 14s（读 WAAPI 时序实测，呼吸循环除外）', () => {
     return page.evaluate(() => {
       const anims = document.getElementById('xjSplash').getAnimations({ subtree: true })
         .filter(x => x.effect.getTiming().iterations !== Infinity);
       if (!anims.length) throw new Error('未检测到开场动画');
       const maxEnd = Math.max(...anims.map(x => x.effect.getTiming().delay + (typeof x.effect.getTiming().duration === 'number' ? x.effect.getTiming().duration : 0)));
-      if (maxEnd > 11500) throw new Error('总时长 ' + Math.round(maxEnd) + 'ms 超出 11.5s');
+      if (maxEnd > 14000) throw new Error('总时长 ' + Math.round(maxEnd) + 'ms 超出 14s');
     });
   });
   await t('文案权威且诚实：铭言「乾坤未定」、主标题为项目名、副标题为「小杰 · 技术支持」、底注含「非官方」，无「官方指定/授权」类违规字样', () => {
     return page.evaluate(() => {
       const s = document.getElementById('xjSplash');
-      if (s.textContent.indexOf('乾坤未定') < 0 || s.textContent.indexOf('黑马') < 0) throw new Error('铭言缺失');
+      if ((document.querySelector('.xj-tw1').getAttribute('data-text') || '').indexOf('乾坤未定') < 0) throw new Error('打字机主句缺失');
+      if (s.textContent.indexOf('黑马') < 0 && (document.querySelector('.xj-tw1').getAttribute('data-text') || '').indexOf('黑马') < 0) throw new Error('铭言缺失');
       if (s.textContent.indexOf('三年晨读') < 0 || s.textContent.indexOf('笔下的从容') < 0) throw new Error('序章长句缺失');
+      if (!document.getElementById('xjCd') || !document.getElementById('xjCdCap')) throw new Error('实时倒计时缺失');
       if (document.querySelector('.xj-title').getAttribute('aria-label').indexOf('山东高考报名助手') < 0) throw new Error('主标题缺少项目名');
       if (document.querySelector('.xj-sub').textContent.indexOf('小杰') < 0) throw new Error('副标题缺少技术支持方');
       if (document.querySelector('.xj-note').textContent.indexOf('非官方') < 0) throw new Error('底注缺少非官方声明');

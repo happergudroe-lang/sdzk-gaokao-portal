@@ -10,7 +10,7 @@ const BASE = 'http://127.0.0.1:8971';
   await p1.evaluate(() => {
     window.__frames = 0; window.__long = 0; window.__t0 = performance.now(); window.__last = 0;
     const loop = (t) => { window.__frames++; if (window.__last && t - window.__last > 32) window.__long++; window.__last = t;
-      if (performance.now() - window.__t0 < 12000) requestAnimationFrame(loop); };
+      if (performance.now() - window.__t0 < 14200) requestAnimationFrame(loop); };
     requestAnimationFrame(loop);
   });
   await p1.waitForTimeout(3400);
@@ -31,7 +31,7 @@ const BASE = 'http://127.0.0.1:8971';
   /* 第二轮：全新会话截图关键帧 */
   const p2 = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
   await p2.goto(BASE + '/', { waitUntil: 'domcontentloaded' });
-  const shots = [[1600, 'v3-beams'], [3600, 'v3-crest-title'], [7000, 'v3-sheen'], [9300, 'v3-sub'], [11500, 'v3-cta']];
+  const shots = [[1800, 'v3-beams'], [3600, 'v3-crest-title'], [7000, 'v3-sheen'], [9600, 'v3-sub'], [13800, 'v3-cta']];
   let prev = 0;
   for (const [ms, name] of shots) {
     await p2.waitForTimeout(ms - prev); prev = ms;
