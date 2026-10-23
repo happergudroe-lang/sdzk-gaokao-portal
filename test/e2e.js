@@ -64,10 +64,12 @@ function computeCheck(first17) {
       if (maxEnd > 4000) throw new Error('总时长 ' + Math.round(maxEnd) + 'ms 超出 4s');
     });
   });
-  await t('文案权威且诚实：副标题含技术支持方、底注含「非官方」，无「官方指定/授权」类违规字样', () => {
+  await t('文案权威且诚实：主标题为「小杰」、副标题为项目名、底注含技术支持方与「非官方」，无「官方指定/授权」类违规字样', () => {
     return page.evaluate(() => {
       const s = document.getElementById('xjSplash');
-      if (document.querySelector('.xj-sub').textContent.indexOf('小杰') < 0) throw new Error('副标题缺少技术支持方');
+      if (document.querySelector('.xj-title').getAttribute('aria-label').indexOf('小杰') < 0) throw new Error('主标题缺少「小杰」');
+      if (document.querySelector('.xj-sub').textContent.indexOf('山东高考报名助手') < 0) throw new Error('副标题缺少项目名');
+      if (document.querySelector('.xj-note').textContent.indexOf('小杰') < 0) throw new Error('底注缺少技术支持方');
       if (document.querySelector('.xj-note').textContent.indexOf('非官方') < 0) throw new Error('底注缺少非官方声明');
       if (/官方指定|授权|教育厅指定/.test(s.textContent)) throw new Error('出现官方感违规文案');
     });

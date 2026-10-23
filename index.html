@@ -313,17 +313,18 @@ body.xj-lock{overflow:hidden}
 .xj-glow{position:absolute;left:50%;top:50%;width:90vmin;height:90vmin;margin:-45vmin 0 0 -45vmin;border-radius:50%;background:radial-gradient(closest-side,rgba(207,169,90,.13),rgba(148,158,178,.09) 45%,rgba(148,158,178,0) 72%);opacity:0;will-change:opacity;pointer-events:none}
 .xj-light{position:absolute;left:50%;top:50%;width:min(74vw,470px);height:1px;margin-left:calc(min(74vw,470px) / -2);background:linear-gradient(90deg,transparent,rgba(255,255,255,.85),transparent);opacity:0;will-change:transform,opacity;pointer-events:none}
 /* V3：权威元素 —— 金印徽记 / 上下鎏金界线 / 标题扫光 */
-.xj-crest{width:46px;height:46px;margin-bottom:26px;border:1px solid rgba(207,169,90,.6);border-radius:50%;display:grid;place-items:center;opacity:0;will-change:transform,opacity;pointer-events:none}
+.xj-crest{width:42px;height:42px;margin-bottom:30px;border:1px solid rgba(207,169,90,.6);border-radius:50%;display:grid;place-items:center;opacity:0;will-change:transform,opacity;pointer-events:none}
 .xj-crest i{display:block;width:7px;height:7px;background:var(--xj-gold);transform:rotate(45deg);box-shadow:0 0 0 4px rgba(207,169,90,.14)}
 .xj-beam{position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(207,169,90,.75) 30%,rgba(207,169,90,.9) 50%,rgba(207,169,90,.75) 70%,transparent);transform:scaleX(0);opacity:0;will-change:transform,opacity;pointer-events:none}
 .xj-beam.t{top:calc(env(safe-area-inset-top,0px) + 34px)}
 .xj-beam.b{bottom:calc(env(safe-area-inset-bottom,0px) + 34px)}
 .xj-lockup{position:relative;display:flex;flex-direction:column;align-items:center;padding:0 20px;max-width:100vw}
-.xj-title{position:relative;display:flex;justify-content:center;font-size:clamp(26px,7.5vw,60px);font-weight:800;line-height:1.25;letter-spacing:.12em;margin:0;opacity:0;transform-origin:50% 50%;overflow:hidden;will-change:transform,opacity}
-.xj-sheen{position:absolute;top:-20%;left:0;width:42%;height:140%;background:linear-gradient(105deg,transparent 20%,rgba(255,255,255,.5) 46%,rgba(207,169,90,.38) 54%,transparent 80%);transform:translateX(-170%) skewX(-14deg);opacity:0;will-change:transform,opacity;pointer-events:none}
-.xj-title span{color:transparent;background:linear-gradient(180deg,#fff 18%,#9fadc2 100%);-webkit-background-clip:text;background-clip:text;margin-right:-.12em}
-.xj-rule{width:min(52vw,230px);height:1px;margin:22px 0 18px;background:linear-gradient(90deg,transparent,var(--xj-gold),transparent);transform:scaleX(0);opacity:0;will-change:transform,opacity}
-.xj-sub{font-size:clamp(12px,2vw,15px);font-weight:500;letter-spacing:.42em;margin-right:-.42em;color:#8b96a8;opacity:0;will-change:transform,opacity}
+.xj-title{position:relative;display:flex;font-size:clamp(72px,23vw,150px);font-weight:800;line-height:1.08;letter-spacing:.08em;margin:0}
+.xj-g{display:block;opacity:0;color:transparent;background:linear-gradient(180deg,#fff 10%,#9fadc2 100%);-webkit-background-clip:text;background-clip:text;will-change:transform,opacity,filter}
+.xj-sheen{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.xj-bar{position:absolute;top:-10%;bottom:-10%;left:0;width:34%;opacity:0;background:linear-gradient(100deg,transparent,rgba(255,255,255,.9),transparent);mix-blend-mode:overlay;will-change:transform,opacity}
+.xj-rule{width:min(42vw,190px);height:1px;margin:26px 0 22px;background:linear-gradient(90deg,transparent,var(--xj-gold),transparent);transform:scaleX(0);opacity:0;will-change:transform,opacity}
+.xj-sub{font-size:clamp(14px,4vw,18px);font-weight:500;letter-spacing:.5em;margin-right:-.5em;color:#b2bccb;opacity:0;clip-path:inset(0 50% 0 50%);will-change:transform,opacity}
 .xj-cta{margin-top:44px;display:flex;flex-direction:column;align-items:center;gap:12px;opacity:0;will-change:transform,opacity}
 .xj-btn{display:inline-flex;align-items:center;justify-content:center;height:54px;min-width:220px;padding:0 38px;border:0;border-radius:27px;background:var(--xj-bone);color:var(--xj-ink);font-size:17px;font-weight:600;font-family:inherit;text-decoration:none;cursor:pointer;transition:transform .18s cubic-bezier(.2,.8,.2,1);-webkit-tap-highlight-color:transparent}
 .xj-btn:active{transform:scale(.96)}
@@ -341,8 +342,8 @@ body.xj-lock{overflow:hidden}
 </head>
 <body>
 
-<!-- 开场动画 V2（权威感升级）：山东高考报名助手 · 由小杰提供技术支持（全部类名 xj- 前缀；「开始报名」= 进入主界面） -->
-<div class="xj-splash" id="xjSplash" role="dialog" aria-label="山东高考报名助手 · 由小杰提供技术支持">
+<!-- 开场动画 V5（聚焦→展开编排）：「杰」单字居中带模糊聚焦登场 → 展开成「小杰」→ 副标题揭幕（全部类名 xj- 前缀；「开始报名」= 进入主界面） -->
+<div class="xj-splash" id="xjSplash" role="dialog" aria-label="小杰 · 山东高考报名助手 · 由小杰提供技术支持">
   <main class="xj-stage">
     <div class="xj-glow"></div>
     <div class="xj-light"></div>
@@ -350,14 +351,14 @@ body.xj-lock{overflow:hidden}
     <div class="xj-beam b" aria-hidden="true"></div>
     <div class="xj-lockup">
       <div class="xj-crest" aria-hidden="true"><i></i></div>
-      <h1 class="xj-title" aria-label="山东高考报名助手"><span aria-hidden="true">山东高考报名助手</span><span class="xj-sheen" aria-hidden="true"></span></h1>
+      <h1 class="xj-title" aria-label="小杰"><span class="xj-g xj-g1" aria-hidden="true">小</span><span class="xj-g xj-g2" aria-hidden="true">杰</span><span class="xj-sheen" aria-hidden="true"><span class="xj-bar"></span></span></h1>
       <div class="xj-rule"></div>
-      <div class="xj-sub">由小杰提供技术支持</div>
+      <div class="xj-sub">山东高考报名助手</div>
       <div class="xj-cta">
         <button class="xj-btn" id="xjEnter" type="button">开始报名</button>
         <button class="xj-link xj-replay" type="button">重播开场动画</button>
       </div>
-      <div class="xj-note">资料仅保存在本机 · 非官方工具</div>
+      <div class="xj-note">由小杰提供技术支持 · 资料仅保存在本机 · 非官方工具</div>
     </div>
   </main>
   <button class="xj-link xj-skip" type="button">跳过</button>
@@ -368,13 +369,15 @@ body.xj-lock{overflow:hidden}
   var q = function (s) { return document.querySelector(s); };
   var splash = q('#xjSplash');
   if (!splash) return;
-  var glow = q('.xj-glow'), light = q('.xj-light'), title = q('.xj-title'), rule = q('.xj-rule'),
+  var glow = q('.xj-glow'), light = q('.xj-light'), rule = q('.xj-rule'),
       sub = q('.xj-sub'), cta = q('.xj-cta'), note = q('.xj-note'), skip = q('.xj-skip'),
       enter = q('#xjEnter'), replay = q('.xj-replay'),
-      crest = q('.xj-crest'), sheen = q('.xj-sheen'), beamT = q('.xj-beam.t'), beamB = q('.xj-beam.b');
+      crest = q('.xj-crest'), g1 = q('.xj-g1'), g2 = q('.xj-g2'), bar = q('.xj-bar'),
+      beamT = q('.xj-beam.t'), beamB = q('.xj-beam.b');
   var KEY = 'xj-splash-seen';
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var E1 = 'cubic-bezier(.16,1,.3,1)';
+  var E2 = 'cubic-bezier(.22,1,.36,1)';
   var anims = [];
 
   function lock(on) { document.body.classList[on ? 'add' : 'remove']('xj-lock'); }
@@ -405,25 +408,30 @@ body.xj-lock{overflow:hidden}
     anims.forEach(function (x) { try { x.cancel(); } catch (e) {} }); anims = [];
     skip.style.display = '';
     if (reduce) {
-      [glow, light, title, sub, cta, note, crest].forEach(function (el) { a(el, [{ opacity: 0 }, { opacity: 1 }], { duration: 300 }); });
+      [glow, g1, g2, sub, cta, note, crest].forEach(function (el) { a(el, [{ opacity: 0 }, { opacity: 1 }], { duration: 400 }); });
       [rule, light, beamT, beamB].forEach(function (el) { a(el, [{ opacity: .8, transform: 'scaleX(1)' }], { duration: 1 }); });
-      a(sheen, [{ opacity: 0 }], { duration: 1 });
+      a(sub, [{ opacity: 1, clipPath: 'inset(0 0 0 0)' }], { duration: 1 });
+      a(bar, [{ opacity: 0 }], { duration: 1 });
       skip.style.display = 'none'; return;
     }
-    /* 权威电动节奏 V4（iOS 级联瀑布式，有限动画总时长约 2.7s）：
-       Apple 流畅感要诀 = 元素错峰并行启动、绝不排队等上一幕走完；临界阻尼缓动（无回弹）显快且稳。
-       界线/光晕(0s) → 徽记(0.35s) → 标题(0.6s) → 扫光/金线(1.3s) → 副标题(1.65s) → CTA(1.95s) → 底注(2.15s)；
-       光晕与 CTA 之后进入极缓呼吸循环（仅 transform，合成器，不掉帧） */
+    /* V5 聚焦→展开编排（有限动画总时长约 3.8s，冲击力优先）：
+       界线/光晕(0s) → 「杰」单字居中·模糊聚焦登场(0.25s) → 徽记(0.35s) → 「杰」滑向左位+「小」从中心浮现(1.4s)
+       → 金线(2.1s) → 副标题揭幕+鎏金扫光(2.3s) → CTA(3.05s) → 底注(3.25s)；光晕与 CTA 呼吸循环（仅 transform） */
+    /* 测量最终位置：让「杰」先居中单独出现，再展开成「小杰」 */
+    var r1 = g1.getBoundingClientRect(), r2 = g2.getBoundingClientRect();
+    var cx = (r1.left + r2.right) / 2;
+    var d2 = cx - (r2.left + r2.width / 2);   /* 杰 → 屏幕中心 */
+    var d1 = cx - (r1.left + r1.width / 2);   /* 小 → 屏幕中心（藏在杰后面） */
     a(beamT, [
       { opacity: 0, transform: 'scaleX(0)' },
       { opacity: .9, transform: 'scaleX(1)', offset: .7 },
       { opacity: .5, transform: 'scaleX(1)' }
-    ], { duration: 1100, easing: 'ease-out' });
+    ], { duration: 900, easing: 'ease-out' });
     a(beamB, [
       { opacity: 0, transform: 'scaleX(0)' },
       { opacity: .9, transform: 'scaleX(1)', offset: .7 },
       { opacity: .5, transform: 'scaleX(1)' }
-    ], { duration: 1100, delay: 120, easing: 'ease-out' });
+    ], { duration: 900, delay: 120, easing: 'ease-out' });
     a(glow, [{ opacity: 0 }, { opacity: 1 }], { duration: 1600, easing: 'ease-out' });
     a(glow, [{ transform: 'scale(1)' }, { transform: 'scale(1.05)' }, { transform: 'scale(1)' }],
       { duration: 6000, delay: 1600, iterations: Infinity, easing: 'ease-in-out' });
@@ -431,26 +439,34 @@ body.xj-lock{overflow:hidden}
       { opacity: 0, transform: 'scaleX(0)' },
       { opacity: .95, transform: 'scaleX(1)', offset: .35 },
       { opacity: .22, transform: 'scaleX(1)' }
-    ], { duration: 1400, delay: 150, easing: 'ease-out' });
+    ], { duration: 1300, delay: 150, easing: 'ease-out' });
+    a(g2, [
+      { opacity: 0, transform: 'translateX(' + d2 + 'px) scale(1.14)', filter: 'blur(14px)' },
+      { opacity: 1, transform: 'translateX(' + d2 + 'px) scale(1)', filter: 'blur(0px)' }
+    ], { duration: 900, delay: 250, easing: E1 });
     a(crest, [
       { opacity: 0, transform: 'scale(.5) rotate(-24deg)' },
       { opacity: 1, transform: 'scale(1) rotate(0deg)' }
-    ], { duration: 650, delay: 350, easing: E1 });
-    a(title, [
-      { opacity: 0, transform: 'scaleY(.04) scaleX(1.03)' },
-      { opacity: 1, transform: 'scaleY(1) scaleX(1)' }
-    ], { duration: 850, delay: 600, easing: E1 });
-    a(sheen, [
-      { opacity: 0, transform: 'translateX(-170%) skewX(-14deg)' },
-      { opacity: .9, transform: 'translateX(20%) skewX(-14deg)', offset: .45 },
-      { opacity: 0, transform: 'translateX(190%) skewX(-14deg)' }
-    ], { duration: 700, delay: 1300, easing: 'cubic-bezier(.4,0,.2,1)' });
-    a(rule, [{ opacity: 0, transform: 'scaleX(0)' }, { opacity: 1, transform: 'scaleX(1)' }], { duration: 650, delay: 1400, easing: E1 });
-    a(sub, [{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 600, delay: 1650, easing: E1 });
-    var last = a(cta, [{ opacity: 0, transform: 'translateY(12px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 650, delay: 1950, easing: E1 });
+    ], { duration: 650, delay: 400, easing: E1 });
+    a(g2, [{ transform: 'translateX(' + d2 + 'px)' }, { transform: 'translateX(0)' }], { duration: 1000, delay: 1400, easing: E2 });
+    a(g1, [
+      { opacity: 0, transform: 'translateX(' + d1 + 'px)' },
+      { opacity: 1, transform: 'translateX(0)' }
+    ], { duration: 1000, delay: 1400, easing: E2 });
+    a(rule, [{ opacity: 0, transform: 'scaleX(0)' }, { opacity: 1, transform: 'scaleX(1)' }], { duration: 700, delay: 2100, easing: E1 });
+    a(sub, [
+      { opacity: 0, clipPath: 'inset(0 50% 0 50%)', transform: 'translateY(6px)' },
+      { opacity: 1, clipPath: 'inset(0 0 0 0)', transform: 'translateY(0)' }
+    ], { duration: 900, delay: 2300, easing: E1 });
+    a(bar, [
+      { opacity: 0, transform: 'translateX(-120%)' },
+      { opacity: 1, offset: .5 },
+      { opacity: 0, transform: 'translateX(320%)' }
+    ], { duration: 1200, delay: 2350, easing: 'ease-in-out' });
+    var last = a(cta, [{ opacity: 0, transform: 'translateY(12px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 650, delay: 3050, easing: E1 });
     a(cta, [{ transform: 'scale(1)' }, { transform: 'scale(1.014)' }, { transform: 'scale(1)' }],
-      { duration: 5000, delay: 2650, iterations: Infinity, easing: 'ease-in-out' });
-    a(note, [{ opacity: 0 }, { opacity: 1 }], { duration: 550, delay: 2150, easing: 'ease-out' });
+      { duration: 5000, delay: 3750, iterations: Infinity, easing: 'ease-in-out' });
+    a(note, [{ opacity: 0 }, { opacity: 1 }], { duration: 550, delay: 3250, easing: 'ease-out' });
     last.finished.then(function () { skip.style.display = 'none'; }).catch(function () {});
   }
 
