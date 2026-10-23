@@ -1,0 +1,9 @@
+{
+  "name": "sdzk-gaokao-portal",
+  "version": "3.0.0",
+  "private": true,
+  "description": "山东高考报名面板：状态直达 + Web Push 开闸提醒 + 一键填写用户脚本",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

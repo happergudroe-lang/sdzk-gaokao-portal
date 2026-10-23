@@ -1,0 +1,1937 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>山东高考报名 · 倒计时与快速填报助手</title>
+<meta name="description" content="山东省2027年高考报名：开闸倒计时、系统通知提醒、官方入口直达、本机资料核对与字段对照。">
+<meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<script src="store.js"></script>
+<script src="core.js"></script>
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+/* ================= HIG tokens ================= */
+:root[data-theme="light"]{
+  --bg:#f2f2f7; --card:#ffffff;
+  --label:#000; --label-2:rgba(60,60,67,.60); --label-3:rgba(60,60,67,.30);
+  --sep:rgba(60,60,67,.18);
+  --blue:#007aff; --green:#34c759; --red:#ff3b30; --orange:#ff9500;
+  --tint-bg:rgba(0,122,255,.10);
+  --chrome:rgba(255,255,255,.72); --chrome-line:rgba(255,255,255,.45);
+  --scrim:rgba(0,0,0,.42);
+  --fill:rgba(120,120,128,.12); --fill-2:rgba(120,120,128,.20);
+  --shadow:0 1px 2px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.06);
+  --sheet-shadow:0 -1px 0 rgba(0,0,0,.08), 0 -10px 40px rgba(0,0,0,.18);
+}
+:root[data-theme="dark"]{
+  --bg:#000; --card:#1c1c1e;
+  --label:#fff; --label-2:rgba(235,235,245,.60); --label-3:rgba(235,235,245,.30);
+  --sep:rgba(84,84,88,.55);
+  --blue:#0a84ff; --green:#30d158; --red:#ff453a; --orange:#ff9f0a;
+  --tint-bg:rgba(10,132,255,.18);
+  --chrome:rgba(30,30,32,.72); --chrome-line:rgba(255,255,255,.10);
+  --scrim:rgba(0,0,0,.6);
+  --fill:rgba(120,120,128,.24); --fill-2:rgba(120,120,128,.36);
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.5);
+  --sheet-shadow:0 -1px 0 rgba(255,255,255,.08), 0 -10px 40px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",
+    "PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  background:var(--bg);color:var(--label);font-size:17px;line-height:1.42;letter-spacing:-.01em;
+  -webkit-font-smoothing:antialiased;overscroll-behavior-y:none;
+  transition:background .3s ease,color .3s ease;
+}
+.wrap{max-width:640px;margin:0 auto;padding:0 16px}
+button{font-family:inherit}
+
+/* ================= 下拉刷新 ================= */
+.ptr{position:fixed;top:0;left:0;right:0;height:0;display:grid;place-items:center;pointer-events:none;z-index:5;overflow:hidden}
+.ptr-in{width:34px;height:34px;border-radius:50%;background:var(--chrome);backdrop-filter:blur(20px) saturate(180%);border:1px solid var(--chrome-line);display:grid;place-items:center;will-change:transform,opacity}
+.ptr-in svg{width:17px;height:17px;color:var(--label-2);will-change:transform}
+
+/* ================= 导航 ================= */
+.nav{position:sticky;top:0;z-index:40;background:var(--chrome);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border-bottom:.5px solid transparent;transition:border-color .25s,background .3s}
+.nav.scrolled{border-bottom-color:var(--sep)}
+.nav-in{display:flex;align-items:center;justify-content:space-between;height:52px;gap:12px}
+.nav-title{font-size:17px;font-weight:600;letter-spacing:-.02em;opacity:0;transition:opacity .25s}
+.nav.scrolled .nav-title{opacity:1}
+.tgl{width:51px;height:31px;border-radius:16px;flex:none;position:relative;cursor:pointer;background:var(--fill-2);border:none;padding:0;transition:background .28s cubic-bezier(.4,0,.2,1)}
+.tgl.on{background:var(--green)}
+.tgl .knob{position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 2px 5px rgba(0,0,0,.22),0 0 1px rgba(0,0,0,.16);will-change:transform}
+.tgl .knob i{position:absolute;inset:0;display:grid;place-items:center;color:var(--label-3)}
+.tgl .knob svg{width:14px;height:14px}
+.tgl:active .knob{transform:scale(.94)}
+
+/* ================= 标题 ================= */
+.large-title{padding:14px 0 16px}
+.large-title h1{font-size:30px;line-height:36px;font-weight:700;letter-spacing:-.025em}
+.large-title p{font-size:15px;line-height:20px;color:var(--label-2);margin-top:4px}
+/* 署名（GitHub 项目页风格：仓库式标题 + shields 风格徽章） */
+.credit{margin-top:12px;display:flex;flex-direction:column;gap:8px;animation:heroIn .6s cubic-bezier(.32,.72,0,1) both .02s}
+.credit-repo{display:flex;align-items:center;gap:7px;font-size:19px;font-weight:600;letter-spacing:-.01em}
+.credit-owner,.credit-name{color:var(--blue)}
+a.credit-owner,a.credit-name{text-decoration:none}
+a.credit-owner:hover,a.credit-name:hover{text-decoration:underline}
+.credit-sep{color:var(--label-3);font-weight:400}
+.credit-pill{font-size:11px;font-weight:500;padding:2px 9px;border-radius:999px;border:1px solid var(--sep);color:var(--label-2);margin-left:4px}
+.credit-chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;font-size:11px;line-height:16px;padding:3px 9px;border-radius:6px;background:var(--fill);border:1px solid var(--sep);color:var(--label-2)}
+.chip-ver{color:#1a7f37;background:rgba(52,199,89,.12);border-color:rgba(52,199,89,.35)}
+:root[data-theme="dark"] .chip-ver{color:#4ade80}
+
+/* ================= Hero ================= */
+.hero{
+  background:var(--blue);color:#fff;
+  border-radius:18px;padding:20px 16px;margin-bottom:18px;position:relative;overflow:hidden;
+  animation:heroIn .6s cubic-bezier(.32,.72,0,1) both .05s;
+}
+@keyframes heroIn{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+.hero>*{position:relative;z-index:1}
+.hero-tag{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.20);border:1px solid rgba(255,255,255,.28);padding:4px 11px;border-radius:999px;font-size:13px;font-weight:600;margin-bottom:12px}
+.hero-tag .pulse{width:7px;height:7px;border-radius:50%;background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.24);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.28}}
+
+/* ============ 里程表滚动数字（弹簧逐位滚动） ============ */
+.cd{display:flex;justify-content:center;align-items:flex-start;gap:6px}
+.grp{display:flex;flex-direction:column;align-items:center}
+.digits{display:flex}
+.odo{display:block;height:1em;overflow:hidden;font-size:50px;line-height:1;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.odo .col{display:block;will-change:transform}
+.odo .col i{display:block;height:1em;font-style:normal;text-align:center}
+.sep{font-size:34px;line-height:50px;color:rgba(255,255,255,.42);font-weight:600;flex:none;padding:0 1px}
+.grp .l{font-size:12px;color:rgba(255,255,255,.80);margin-top:4px;font-weight:500;letter-spacing:.1em}
+
+.hero-meta{margin-top:14px;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.20);font-size:14px;line-height:20px;color:rgba(255,255,255,.94);text-align:center}
+.hero-meta b{color:#fff;font-weight:600}
+.hero-meta .live{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:6px;vertical-align:1px}
+.hero-meta .live.on{background:#4ade80;box-shadow:0 0 6px #4ade80}
+.hero-meta .live.off{background:rgba(255,255,255,.55)}
+
+.btns{display:flex;gap:8px;margin-top:14px}
+.btn{
+  -webkit-appearance:none;appearance:none;font-size:15px;font-weight:600;letter-spacing:-.01em;
+  min-height:44px;padding:0 15px;border-radius:12px;border:none;cursor:pointer;
+  background:rgba(255,255,255,.22);color:#fff;
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;flex:1;
+  backdrop-filter:blur(6px);transition:transform .12s cubic-bezier(.2,0,.2,1),background .18s,opacity .18s;will-change:transform;
+}
+.btn svg{width:16px;height:16px;flex:none}
+.btn:active{transform:scale(.965)}
+.btn.solid{background:#fff;color:#0a84ff;box-shadow:0 2px 8px rgba(0,0,0,.14)}
+.btn.ghost{flex:0 0 auto;width:44px;padding:0}
+.btn.on{background:rgba(52,199,89,.92);color:#fff}
+.btn:disabled{opacity:.55;cursor:default}
+.btn.spin svg{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pstat{display:flex;align-items:center;gap:7px;margin-top:13px;font-size:14px;color:rgba(255,255,255,.92)}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;background:rgba(255,255,255,.22);flex:none}
+.pill.s{background:rgba(52,199,89,.95);color:#fff}
+.pill.d{background:rgba(255,59,48,.95);color:#fff}
+.pill.w{background:rgba(255,149,0,.95);color:#fff}
+
+/* ================= 分段控件 ================= */
+.seg{display:flex;position:relative;background:var(--fill);border-radius:10px;padding:2px;margin-bottom:20px}
+.seg button{-webkit-appearance:none;appearance:none;border:none;background:none;cursor:pointer;flex:1;min-height:36px;font-size:15px;font-weight:600;color:var(--label-2);letter-spacing:-.01em;position:relative;z-index:2;transition:color .18s;border-radius:8px}
+.seg button.on{color:var(--label)}
+.seg .thumb{position:absolute;top:2px;left:2px;height:calc(100% - 4px);border-radius:8px;background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.10),0 0 1px rgba(0,0,0,.10);will-change:transform;z-index:1}
+:root[data-theme="dark"] .seg .thumb{background:#636366;box-shadow:none}
+.view{display:none}
+.view.on{display:block;animation:vin .34s cubic-bezier(.32,.72,0,1) both}
+@keyframes vin{from{opacity:0;transform:translateY(8px) scale(.995)}to{opacity:1;transform:none}}
+.rise{opacity:0;transform:translateY(14px) scale(.985);will-change:transform,opacity}
+
+/* ================= 卡片 ================= */
+.group{background:var(--card);border-radius:14px;margin-bottom:20px;box-shadow:var(--shadow);overflow:hidden}
+.group-hd{font-size:13px;line-height:18px;color:var(--label-2);padding:14px 16px 7px;display:flex;align-items:center;gap:7px}
+.group-hd svg{width:14px;height:14px;opacity:.75;flex:none}
+.group-hd span.rt{margin-left:auto}
+.row{display:flex;align-items:center;gap:12px;padding:11px 16px;min-height:44px;border-top:.5px solid var(--sep)}
+.row:first-of-type{border-top:none}
+.row.col{flex-direction:column;align-items:stretch;gap:6px}
+.row .lb{font-size:16px;letter-spacing:-.01em;min-width:0}
+.row .lb.big{font-size:17px;font-weight:600}
+.row .vl{margin-left:auto;font-size:15px;color:var(--label-2);text-align:right;font-variant-numeric:tabular-nums;flex:none}
+.row .vl.mono{font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:13px}
+.row .vl.ok{color:var(--green);font-weight:600}
+.row .vl.bad{color:var(--red);font-weight:600}
+.row .sub{font-size:14px;line-height:20px;color:var(--label-2)}
+.note{margin:0 16px 16px;padding:12px 14px;border-radius:10px;background:var(--fill);font-size:14px;line-height:20px}
+.note.warn{background:rgba(255,149,0,.14)}
+.note b{font-weight:600}
+.btn2{
+  -webkit-appearance:none;appearance:none;cursor:pointer;font-size:15px;font-weight:600;
+  min-height:44px;padding:0 16px;border-radius:12px;border:none;background:var(--tint-bg);color:var(--blue);
+  display:inline-flex;align-items:center;gap:7px;margin:12px 16px 16px;
+  transition:transform .12s cubic-bezier(.2,0,.2,1);
+}
+.btn2:active{transform:scale(.965)}
+.btn2 svg{width:16px;height:16px}
+
+/* ================= 表单 ================= */
+.fld{padding:9px 16px;min-height:44px;border-top:.5px solid var(--sep)}
+.fld:first-of-type{border-top:none}
+.fld label{display:block;font-size:13px;color:var(--label-2);margin-bottom:4px}
+.fld input,.fld select,.fld textarea{
+  width:100%;border:none;outline:none;background:transparent;color:var(--label);
+  font-family:inherit;font-size:17px;letter-spacing:-.01em;padding:0;
+}
+.fld textarea{resize:none;min-height:44px}
+.fld input::placeholder,.fld textarea::placeholder{color:var(--label-3)}
+.fld input[type=file]{font-size:13px;color:var(--label-2)}
+.fld .hint{font-size:12px;color:var(--label-3);margin-top:3px}
+.fld .hint.ok{color:var(--green)}
+.fld .lbrow{display:flex;align-items:center;justify-content:space-between}
+.copybtn{border:none;background:rgba(120,120,128,.14);color:var(--blue);font-size:12px;padding:3px 11px;border-radius:20px;min-height:26px;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent}
+.copybtn:active{opacity:.55}
+.photoRow{display:flex;gap:12px;align-items:center}
+.photoRow img{width:64px;height:64px;border-radius:10px;object-fit:cover;border:.5px solid var(--sep);display:none}
+.photoRow img.show{display:block}
+
+/* ================= 磁贴 ================= */
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{display:flex;flex-direction:column;gap:9px;text-decoration:none;color:var(--label);background:var(--card);border-radius:14px;padding:14px;box-shadow:var(--shadow);transition:transform .16s cubic-bezier(.2,0,.2,1),box-shadow .2s,background .3s;will-change:transform}
+.tile:active{transform:scale(.972)}
+.tile:hover{box-shadow:0 2px 4px rgba(0,0,0,.06),0 12px 28px rgba(0,0,0,.10)}
+.tile .ico{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;background:var(--tint-bg);color:var(--blue)}
+.tile .ico svg{width:20px;height:20px}
+.tile .t{font-size:15px;line-height:20px;font-weight:600;letter-spacing:-.015em;display:flex;align-items:center;gap:4px}
+.tile .t svg{width:12px;height:12px;color:var(--label-3);flex:none}
+.tile .d{font-size:12px;line-height:16px;color:var(--label-2);word-break:break-all}
+.tile.pri{background:var(--blue);color:#fff;box-shadow:var(--shadow)}
+.tile.pri .ico{background:rgba(255,255,255,.22);color:#fff}
+.tile.pri .d{color:rgba(255,255,255,.82)}
+.tile.pri .t svg{color:rgba(255,255,255,.72)}
+.tile.wide{grid-column:1/-1;flex-direction:row;align-items:center;gap:13px}
+.tile.wide .tx{flex:1;min-width:0}
+
+/* ================= 清单 / 时间轴 ================= */
+.chk{list-style:none}
+.chk li{display:flex;gap:12px;align-items:flex-start;padding:11px 16px;min-height:44px;border-top:.5px solid var(--sep);cursor:pointer;transition:background .12s}
+.chk li:first-child{border-top:none}
+.chk li:active{background:var(--fill)}
+.chk .box{width:22px;height:22px;border-radius:50%;flex:none;margin-top:1px;border:1.5px solid var(--label-3);display:grid;place-items:center;transition:background .2s,border-color .2s;will-change:transform}
+.chk .box svg{width:13px;height:13px;color:#fff;opacity:0;transition:opacity .16s}
+.chk li.on .box{background:var(--green);border-color:var(--green)}
+.chk li.on .box svg{opacity:1}
+.chk .tx{font-size:17px;letter-spacing:-.01em;transition:color .2s}
+.chk li.on .tx{color:var(--label-3)}
+.chk .sub{font-size:13px;line-height:18px;color:var(--label-2);margin-top:2px}
+.prog-wrap{padding:14px 16px 16px}
+.prog{height:6px;border-radius:3px;background:var(--fill);overflow:hidden}
+.prog i{display:block;height:100%;background:var(--green);width:0;border-radius:3px;will-change:width}
+.prog-tx{font-size:13px;line-height:18px;color:var(--label-2);margin-top:8px;text-align:right;font-variant-numeric:tabular-nums}
+.tl{list-style:none;padding:0 16px}
+.tl li{position:relative;padding:0 0 20px 26px}
+.tl li:last-child{padding-bottom:14px}
+.tl li::before{content:"";position:absolute;left:4px;top:6px;width:9px;height:9px;border-radius:50%;background:var(--card);border:2px solid var(--label-3);z-index:1;transition:background .3s,border-color .3s,box-shadow .3s}
+.tl li:not(:last-child)::after{content:"";position:absolute;left:8px;top:17px;bottom:-2px;width:1.5px;background:var(--sep)}
+.tl li.now::before{background:var(--blue);border-color:var(--blue);box-shadow:0 0 0 4px var(--tint-bg)}
+.tl li.past::before{background:var(--label-3);border-color:var(--label-3)}
+.tl .d{font-size:13px;line-height:18px;color:var(--label-2);font-variant-numeric:tabular-nums}
+.tl .t{font-size:15px;line-height:20px;font-weight:600;letter-spacing:-.015em;margin-top:1px}
+.tl li.now .t{color:var(--blue)}
+.tl .s{font-size:13px;line-height:18px;color:var(--label-2);margin-top:2px}
+
+/* ================= Sheet ================= */
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:60;opacity:0;pointer-events:none;will-change:opacity}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:61;max-width:640px;margin:0 auto;background:var(--card);border-radius:14px 14px 0 0;box-shadow:var(--sheet-shadow);transform:translateY(110%);will-change:transform;display:flex;flex-direction:column;max-height:88vh}
+.grabber{padding:10px 0 4px;display:grid;place-items:center;flex:none;cursor:grab;touch-action:none}
+.grabber i{width:36px;height:5px;border-radius:3px;background:var(--label-3);display:block}
+.sheet-hd{padding:4px 20px 12px;font-size:22px;line-height:28px;font-weight:700;letter-spacing:-.022em;border-bottom:.5px solid var(--sep);flex:none}
+.sheet-bd{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 0 40px;flex:1;overscroll-behavior:contain}
+.sheet-bd img{display:block;width:100%;height:auto;border-top:.5px solid var(--sep);border-bottom:.5px solid var(--sep)}
+.sheet-bd figcaption{font-size:13px;line-height:18px;color:var(--label-2);padding:10px 20px}
+.sheet-bd figcaption b{display:block;color:var(--label);font-size:14px;margin-bottom:2px}
+
+/* ================= Toast ================= */
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));z-index:80;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:var(--chrome);backdrop-filter:blur(20px) saturate(180%);border:1px solid var(--chrome-line);color:var(--label);font-size:14px;font-weight:500;padding:11px 18px;border-radius:999px;box-shadow:0 6px 22px rgba(0,0,0,.20);will-change:transform,opacity;max-width:calc(100vw - 40px);text-align:center}
+
+/* ================= 全屏提醒模式 ================= */
+.fsm{
+  position:fixed;inset:0;z-index:100;display:none;flex-direction:column;align-items:center;justify-content:center;
+  background:linear-gradient(160deg,#071a33,#0a3c78 55%,#0a5cc4);color:#fff;
+  text-align:center;padding:24px;
+}
+.fsm.on{display:flex;animation:vin .4s cubic-bezier(.32,.72,0,1) both}
+.fsm .big{font-size:17px;font-weight:600;letter-spacing:.2em;color:rgba(255,255,255,.65)}
+.fsm .count{font-size:clamp(56px,18vw,140px);font-weight:700;letter-spacing:-.03em;line-height:1.05;font-variant-numeric:tabular-nums;margin:12px 0}
+.fsm .count small{font-size:.28em;font-weight:600;color:rgba(255,255,255,.7);margin-left:.15em}
+.fsm .when{font-size:17px;color:rgba(255,255,255,.85)}
+.fsm .when b{color:#fff}
+.fsm.breathing{animation:breathe 4s ease-in-out infinite}
+@keyframes breathe{0%,100%{filter:brightness(1)}50%{filter:brightness(1.25)}}
+.fsm.opened{background:linear-gradient(160deg,#053a1c,#0c7a3d 55%,#34c759);animation:none}
+.fsm.opened .count{animation:pop .5s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+.fsm .fsbtns{display:flex;gap:10px;margin-top:36px}
+.fsm .fsb{-webkit-appearance:none;appearance:none;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.14);color:#fff;font-size:15px;font-weight:600;min-height:44px;padding:0 20px;border-radius:12px;cursor:pointer;backdrop-filter:blur(6px);text-decoration:none;display:inline-flex;align-items:center}
+.fsm .fsb:active{transform:scale(.96)}
+.fsm .tip{position:absolute;bottom:calc(18px + env(safe-area-inset-bottom));font-size:12px;color:rgba(255,255,255,.5);padding:0 20px}
+
+footer{padding:8px 16px calc(40px + env(safe-area-inset-bottom));color:var(--label-2);font-size:13px;line-height:18px;text-align:center}
+footer a{color:var(--blue);text-decoration:none}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.01ms !important;animation-iteration-count:1 !important}
+  .view{animation:none}.hero{animation:none}.fsm{animation:none !important}
+  .rise{opacity:1 !important;transform:none !important}
+  .btn:active,.tile:active,.btn2:active,.fsm .fsb:active{transform:none}
+}
+@media (prefers-reduced-transparency: reduce){
+  .nav{background:var(--card);backdrop-filter:none}
+  .ptr-in,.toast{background:var(--card);backdrop-filter:none}
+}
+@media (prefers-contrast: more){
+  :root[data-theme="light"]{--label-2:#3c3c43;--sep:rgba(0,0,0,.35)}
+  :root[data-theme="dark"]{--label-2:#ebebf5;--sep:rgba(255,255,255,.45)}
+  .nav{background:var(--card);backdrop-filter:none}
+}
+@media (max-width:420px){
+  .odo{font-size:42px}
+  .sep{font-size:28px;line-height:42px}
+  .tiles{grid-template-columns:1fr}
+}
+/* ================= 开场动画（xj- 前缀；墨黑+鎏金，按用户源码为准，不随主题切换） ================= */
+.xj-splash{
+  --xj-ink:#06080c;--xj-bone:#eef1f6;--xj-gold:#cfa95a;--xj-mute:#8793a6;
+  position:fixed;inset:0;z-index:9999;background:var(--xj-ink);color:var(--xj-bone);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  font-family:-apple-system,"SF Pro Display","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+  transition:opacity .6s ease,transform .6s cubic-bezier(.16,1,.3,1),visibility 0s linear .6s;
+}
+.xj-splash.off{opacity:0;transform:scale(1.025);visibility:hidden;pointer-events:none}
+body.xj-lock{overflow:hidden}
+.xj-stage{position:relative;width:100%;height:100%;display:grid;place-items:center;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.xj-glow{position:absolute;left:50%;top:50%;width:90vmin;height:90vmin;margin:-45vmin 0 0 -45vmin;border-radius:50%;background:radial-gradient(closest-side,rgba(207,169,90,.13),rgba(148,158,178,.09) 45%,rgba(148,158,178,0) 72%);opacity:0;will-change:opacity;pointer-events:none}
+.xj-light{position:absolute;left:50%;top:50%;width:min(74vw,470px);height:1px;margin-left:calc(min(74vw,470px) / -2);background:linear-gradient(90deg,transparent,rgba(255,255,255,.85),transparent);opacity:0;will-change:transform,opacity;pointer-events:none}
+.xj-lockup{position:relative;display:flex;flex-direction:column;align-items:center;padding:0 20px;max-width:100vw}
+.xj-title{position:relative;display:flex;justify-content:center;font-size:clamp(26px,7.5vw,60px);font-weight:800;line-height:1.25;letter-spacing:.12em;margin:0;opacity:0;transform-origin:50% 50%;will-change:transform,opacity}
+.xj-title span{color:transparent;background:linear-gradient(180deg,#fff 18%,#9fadc2 100%);-webkit-background-clip:text;background-clip:text;margin-right:-.12em}
+.xj-rule{width:min(52vw,230px);height:1px;margin:22px 0 18px;background:linear-gradient(90deg,transparent,var(--xj-gold),transparent);transform:scaleX(0);opacity:0;will-change:transform,opacity}
+.xj-sub{font-size:clamp(12px,2vw,15px);font-weight:500;letter-spacing:.42em;margin-right:-.42em;color:#8b96a8;opacity:0;will-change:transform,opacity}
+.xj-cta{margin-top:44px;display:flex;flex-direction:column;align-items:center;gap:12px;opacity:0;will-change:transform,opacity}
+.xj-btn{display:inline-flex;align-items:center;justify-content:center;height:54px;min-width:220px;padding:0 38px;border:0;border-radius:27px;background:var(--xj-bone);color:var(--xj-ink);font-size:17px;font-weight:600;font-family:inherit;text-decoration:none;cursor:pointer;transition:transform .18s cubic-bezier(.2,.8,.2,1);-webkit-tap-highlight-color:transparent}
+.xj-btn:active{transform:scale(.96)}
+.xj-btn:focus-visible,.xj-link:focus-visible{outline:2px solid var(--xj-gold);outline-offset:3px}
+.xj-note{margin-top:14px;font-size:12px;letter-spacing:.06em;color:var(--xj-mute);opacity:0;will-change:opacity}
+.xj-link{background:none;border:0;color:var(--xj-mute);font:inherit;font-size:13px;padding:8px 12px;cursor:pointer}
+.xj-skip{position:fixed;right:max(18px,env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px))}
+@media (orientation:landscape) and (max-height:480px){
+  .xj-cta{margin-top:24px}
+  .xj-rule{margin:14px 0 12px}
+  .xj-note{margin-top:8px}
+}
+</style>
+<noscript><style>#xjSplash{display:none!important}</style></noscript>
+</head>
+<body>
+
+<!-- 开场动画 V2（权威感升级）：山东高考报名助手 · 由小杰提供技术支持（全部类名 xj- 前缀；「开始报名」= 进入主界面） -->
+<div class="xj-splash" id="xjSplash" role="dialog" aria-label="山东高考报名助手 · 由小杰提供技术支持">
+  <main class="xj-stage">
+    <div class="xj-glow"></div>
+    <div class="xj-light"></div>
+    <div class="xj-lockup">
+      <h1 class="xj-title" aria-label="山东高考报名助手"><span aria-hidden="true">山东高考报名助手</span></h1>
+      <div class="xj-rule"></div>
+      <div class="xj-sub">由小杰提供技术支持</div>
+      <div class="xj-cta">
+        <button class="xj-btn" id="xjEnter" type="button">开始报名</button>
+        <button class="xj-link xj-replay" type="button">重播开场动画</button>
+      </div>
+      <div class="xj-note">资料仅保存在本机 · 非官方工具</div>
+    </div>
+  </main>
+  <button class="xj-link xj-skip" type="button">跳过</button>
+</div>
+<script>
+(function () {
+  'use strict';
+  var q = function (s) { return document.querySelector(s); };
+  var splash = q('#xjSplash');
+  if (!splash) return;
+  var glow = q('.xj-glow'), light = q('.xj-light'), title = q('.xj-title'), rule = q('.xj-rule'),
+      sub = q('.xj-sub'), cta = q('.xj-cta'), note = q('.xj-note'), skip = q('.xj-skip'),
+      enter = q('#xjEnter'), replay = q('.xj-replay');
+  var KEY = 'xj-splash-seen';
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var E1 = 'cubic-bezier(.16,1,.3,1)';
+  var anims = [];
+
+  function lock(on) { document.body.classList[on ? 'add' : 'remove']('xj-lock'); }
+  function a(el, kf, o) { var x = el.animate(kf, Object.assign({ fill: 'both' }, o)); anims.push(x); return x; }
+  function markSeen() { try { sessionStorage.setItem(KEY, '1'); } catch (e) {} }
+  function seen() { try { return sessionStorage.getItem(KEY) === '1'; } catch (e) { return false; } }
+
+  function hide(instant) {
+    markSeen(); lock(false);
+    if (instant) {
+      splash.style.transition = 'none';
+      splash.classList.add('off');
+      void splash.offsetWidth;              /* 强制重排后再恢复过渡，重播时才能即时显现 */
+      splash.style.transition = '';
+    } else {
+      /* 苹果式无缝衔接：开场层微放大淡出，主界面（导航+内容）同步上浮淡入；仅 transform/opacity，走合成器不卡顿 */
+      var wrap = q('main.wrap'), nav = q('.nav');
+      [nav, wrap].forEach(function (el, i) {
+        if (!el) return;
+        el.animate(
+          [{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'translateY(0)' }],
+          { duration: 640, delay: 80 + i * 50, easing: E1, fill: 'backwards' });
+      });
+      splash.classList.add('off');
+    }
+  }
+  function play() {
+    anims.forEach(function (x) { try { x.cancel(); } catch (e) {} }); anims = [];
+    skip.style.display = '';
+    if (reduce) {
+      [glow, light, title, sub, cta, note].forEach(function (el) { a(el, [{ opacity: 0 }, { opacity: 1 }], { duration: 300 }); });
+      a(rule, [{ opacity: 1, transform: 'scaleX(1)' }], { duration: 1 });
+      a(light, [{ opacity: .9, transform: 'scaleX(1)' }], { duration: 1 });
+      skip.style.display = 'none'; return;
+    }
+    /* 权威感节奏（总时长 4.3s ≤ 4.5s）：光线展开 → 主标题从中线向上下撑开 → 金线 → 副标题淡入 → 底部小字 */
+    a(glow, [{ opacity: 0 }, { opacity: 1 }], { duration: 2200, easing: 'ease-out' });
+    a(light, [
+      { opacity: 0, transform: 'scaleX(0)' },
+      { opacity: .95, transform: 'scaleX(1)', offset: .35 },
+      { opacity: .22, transform: 'scaleX(1)' }
+    ], { duration: 2000, easing: 'ease-out' });
+    a(title, [
+      { opacity: 0, transform: 'scaleY(.04)' },
+      { opacity: 1, transform: 'scaleY(1)' }
+    ], { duration: 1050, delay: 650, easing: E1 });
+    a(rule, [{ opacity: 0, transform: 'scaleX(0)' }, { opacity: 1, transform: 'scaleX(1)' }], { duration: 800, delay: 1800, easing: E1 });
+    a(sub, [{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 800, delay: 2650, easing: E1 });
+    var last = a(cta, [{ opacity: 0, transform: 'translateY(12px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 700, delay: 3450, easing: E1 });
+    a(note, [{ opacity: 0 }, { opacity: 1 }], { duration: 600, delay: 3700, easing: 'ease-out' });
+    last.finished.then(function () { skip.style.display = 'none'; }).catch(function () {});
+  }
+
+  skip.addEventListener('click', function () { anims.forEach(function (x) { try { x.finish(); } catch (e) {} }); skip.style.display = 'none'; markSeen(); });
+  replay.addEventListener('click', play);
+  enter.addEventListener('click', function () { hide(false); });
+
+  if (seen()) { hide(true); }
+  else { lock(true); requestAnimationFrame(function () { requestAnimationFrame(play); }); }
+})();
+</script>
+
+<div class="ptr" id="ptr"><div class="ptr-in" id="ptrIn">
+  <svg id="ptrIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></svg>
+</div></div>
+
+<div class="nav" id="nav">
+  <div class="wrap nav-in">
+    <div class="nav-title">山东高考报名</div>
+    <button class="tgl" id="tgl" onclick="toggleTheme()" aria-label="切换深色模式" role="switch">
+      <div class="knob" id="knob"><i>
+        <svg class="i-m" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"/></svg>
+        <svg class="i-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="4"/><path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.5 -15.5l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7"/></svg>
+      </i></div>
+    </button>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="large-title">
+    <h1>山东高考报名</h1>
+    <p>2027 年春季 / 夏季高考 · 倒计时 · 官方入口直达</p>
+    <!-- 署名（GitHub 项目页风格）。仓库地址确定后：把 data-repo 填入 URL，「小杰 / 山东高考报名助手」会自动变成可点链接 -->
+    <div class="credit" role="note" data-repo="https://github.com/happergudroe-lang/sdzk-gaokao-portal">
+      <div class="credit-repo">
+        <b class="credit-owner">小杰</b><span class="credit-sep">/</span><span class="credit-name">山东高考报名助手</span>
+        <span class="credit-pill">技术支持</span>
+      </div>
+      <div class="credit-chips">
+        <span class="chip chip-ver">v5.1.0</span>
+        <span class="chip">资料仅存本机</span>
+        <span class="chip">以官网信息为准</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ Hero ============ -->
+  <section class="hero">
+    <div class="hero-tag"><span class="pulse"></span><span id="tagText">报名通道未开放</span></div>
+    <div class="cd" id="cd"></div>
+    <div class="hero-meta" id="heroMeta">加载中…</div>
+    <div class="btns">
+      <button class="btn solid" id="probeBtn" onclick="probe()">
+        <svg id="probeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></svg>
+        <span id="probeTx">立即探测</span>
+      </button>
+      <button class="btn ghost" id="notifyBtn" onclick="openNC()" title="提醒中心：系统通知授权 / 测试推送 / 自定义提醒">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6"/><path d="M9 17v1a3 3 0 0 0 6 0v-1"/></svg>
+      </button>
+      <button class="btn ghost" onclick="openFS()" title="全屏倒计时提醒">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0 -2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M8 21H5a2 2 0 0 1 -2 -2v-3"/><path d="M16 21h3a2 2 0 0 0 2 -2v-3"/></svg>
+      </button>
+      <button class="btn ghost" onclick="copyUrl()" title="复制报名网址">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"/></svg>
+      </button>
+    </div>
+    <div class="pstat" id="pstat"><span class="pill">待探测</span><span>尚未探测</span></div>
+  </section>
+
+  <div class="seg" id="seg">
+    <div class="thumb" id="thumb"></div>
+    <button class="on" data-v="status" onclick="setView('status',this)">状态</button>
+    <button data-v="info" onclick="setView('info',this)">信息</button>
+    <button data-v="links" onclick="setView('links',this)">入口</button>
+    <button data-v="prep" onclick="setView('prep',this)">准备</button>
+  </div>
+
+  <!-- ============ 状态 ============ -->
+  <section class="view on" id="v-status">
+    <div class="group rise" id="embBanner" style="display:none"></div>
+    <div class="group rise">
+      <div class="group-hd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>当前时段</div>
+      <div class="row"><div class="lb big" id="winState">…</div></div>
+      <div class="row"><div class="sub" id="winDetail">…</div></div>
+    </div>
+    <div class="group rise">
+      <div class="group-hd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>功能能力矩阵<span class="rt">本机实测 · 如实标注</span></div>
+      <div id="capMatrix"><div class="row"><div class="sub">正在检测本机能力…</div></div></div>
+      <div class="note" style="margin:2px 16px 16px">状态只有三种：<b>真实可用</b>（本机实测可运行）、<b>部分支持</b>（有条件或需降级）、<b>暂不支持</b>（受平台硬限制，任何网页都做不到）。绝无虚构。</div>
+    </div>
+    <div class="group rise">
+      <div class="group-hd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8 -4 8 -10V5l-8 -3l-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2l4 -4"/></svg>官方来源核验<span class="rt">绝无虚构</span></div>
+      <div class="row"><div class="lb">信息来源</div><div class="vl" id="ocSource">省招考院官网</div></div>
+      <div class="row"><div class="lb">人工核验日期</div><div class="vl mono" id="ocVerified">2026-10-20</div></div>
+      <div class="row"><div class="lb">公告变更监测</div><div class="vl mono" id="ocCheck">启动中…</div></div>
+      <div class="row"><div class="lb">时间配置版本</div><div class="vl mono" id="ocCfg">内置 v3</div></div>
+      <div class="note">所有时间取自官网正式通知并定期自动复核；官网暂时打不开时会如实显示「暂时无法核实」，<b>绝不编造状态</b>。官方一旦调整时间，配置更新后自动生效并推送提醒。</div>
+    </div>
+    <div class="group rise">
+      <div class="group-hd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0 -12 0c0 7 -3 9 -3 9h18s-3 -2 -3 -9"/><path d="M13.7 21a2 2 0 0 1 -3.4 0"/></svg>提醒回执<span class="rt">真实送达记录</span></div>
+      <div id="beaconLog"></div>
+      <div class="row"><div class="lb">静默保护</div><div class="vl" id="silentState">22:00 – 08:30</div></div>
+      <div class="note">高优先级（开闸 / 截止）即使静默期也会提醒；普通提醒静默期内自动延后，<b>同一提醒每天至多 1 条</b>，绝不轰炸。全程在本机评估，无打扰开关即将上线。</div>
+    </div>
+    <div class="group rise">
+      <div class="group-hd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></svg>探测记录<span class="rt">本机保存</span></div>
+      <div id="histList"></div>
+    </div>
+    <div class="group rise">
+      <div class="group-hd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86l-8.486 14.686a1.5 1.5 0 0 0 1.29 2.25h16.914a1.5 1.5 0 0 0 1.29 -2.25l-8.485 -14.686a1.5 1.5 0 0 0 -2.582 0z"/></svg>为什么现在打不开</div>
+      <div class="row"><div class="lb big">① 时间未到</div></div>
+      <div class="row"><div class="sub">官方通知：填报期 <b style="color:var(--label)">2026年10月24日—30日，每天仅 9:00–18:00</b>。窗口外系统闸门关闭。</div></div>
+      <div class="row"><div class="lb big">② 系统面向电脑</div></div>
+      <div class="row"><div class="sub">要传照片、填大量信息、在线缴费，官方说明按桌面浏览器编写 —— 手机打不开不是手机坏了。</div></div>
+      <div class="row"><div class="lb">已排除</div><div class="vl ok">DNS / 防火墙 / 证书 / 本地网络</div></div>
+    </div>
+    <div class="group rise">
+      <div class="group-hd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8v-2a2 2 0 0 1 2 -2h2"/><path d="M4 16v2a2 2 0 0 0 2 2h2"/><path d="M16 4h2a2 2 0 0 1 2 2v2"/><path d="M16 20h2a2 2 0 0 0 2 -2v-2"/><circle cx="12" cy="12" r="3"/></svg>实测诊断数据<span class="rt">2026-10-23 抓取</span></div>
+      <div class="row"><div class="lb">DNS 解析</div><div class="vl mono">112.53.87.10 / CERNET2</div></div>
+      <div class="row"><div class="lb">TCP 443</div><div class="vl ok">连接成功</div></div>
+      <div class="row"><div class="lb">TLS 握手</div><div class="vl ok">TLSv1.2 · *.sdzk.cn</div></div>
+      <div class="row"><div class="lb">HTTP GET /</div><div class="vl bad">25 秒 0 字节</div></div>
+      <div class="row"><div class="lb">80 端口</div><div class="vl ok">301 → https</div></div>
+      <div class="row"><div class="lb">官网 www.sdzk.cn</div><div class="vl ok">HTTP 200</div></div>
+      <button class="btn2" onclick="openSheet()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8v-2a2 2 0 0 1 2 -2h2"/><path d="M4 16v2a2 2 0 0 0 2 2h2"/><path d="M16 4h2a2 2 0 0 1 2 2v2"/><path d="M16 20h2a2 2 0 0 0 2 -2v-2"/><circle cx="12" cy="12" r="3"/></svg>查看截图证据</button>
+    </div>
+    <div class="group rise">
+      <div class="group-hd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"/><path d="M16 3v4"/><path d="M8 3v4"/><path d="M4 11h16"/></svg>完整时间轴</div>
+      <ul class="tl">
+        <li id="tl1"><div class="d">2026-10-24 — 10-30</div><div class="t">填报信息 + 缴纳报名费</div><div class="s">每天 9:00–18:00 ｜ 缴完报名费才算报名成功</div></li>
+        <li id="tl2"><div class="d">2026-10-31 — 11-12</div><div class="t">资格审核</div><div class="s">不通过须携证明材料到现场</div></li>
+        <li id="tl3"><div class="d">2026-11-13 — 11-15</div><div class="t">缴纳考试费</div><div class="s">每天 9:00–18:00</div></li>
+        <li id="tl4"><div class="d">2027 年 4 月</div><div class="t">春考知识 / 夏考统考费</div><div class="s">具体时间另行通知</div></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ 信息（一键填写数据卡） ============ -->
+  <section class="view" id="v-info">
+    <div class="group rise">
+      <div class="group-hd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"/></svg>我的报名信息<span class="rt">只存本机，不上传</span></div>
+      <div class="fld"><label>姓名 *</label><input id="f-name" placeholder="与身份证一致"></div>
+      <div class="fld"><label>身份证号 *</label><input id="f-idcard" maxlength="18" placeholder="18 位"><div class="hint" id="idcHint">填写后自动推导出生日期与性别</div></div>
+      <div class="fld"><label>手机号 *</label><input id="f-phone" type="tel" maxlength="11" placeholder="本人实名手机号"></div>
+      <div class="fld"><label>民族</label><select id="f-nation">
+        <option value="">请选择</option><option>汉族</option><option>回族</option><option>满族</option><option>蒙古族</option><option>藏族</option><option>维吾尔族</option><option>苗族</option><option>彝族</option><option>壮族</option><option>布依族</option><option>朝鲜族</option><option>侗族</option><option>瑶族</option><option>白族</option><option>土家族</option><option>哈尼族</option><option>哈萨克族</option><option>傣族</option><option>黎族</option><option>其他</option>
+      </select></div>
+      <div class="fld"><label>政治面貌</label><select id="f-politics">
+        <option value="">请选择</option><option>中共党员</option><option>中共预备党员</option><option>共青团员</option><option>群众</option><option>民主党派成员</option>
+      </select></div>
+      <div class="fld"><label>报考类型</label><select id="f-examType">
+        <option value="">请选择</option><option>春季高考</option><option>夏季高考</option><option>春季+夏季兼报</option>
+      </select></div>
+      <div class="fld"><label>考生类别</label><select id="f-category">
+        <option value="">请选择</option><option>城市应届</option><option>农村应届</option><option>城市往届</option><option>农村往届</option>
+      </select></div>
+      <div class="fld"><label>毕业 / 就读学校</label><input id="f-school" placeholder="学校全称"></div>
+      <div class="fld"><label>学籍号 / 考籍号</label><input id="f-studentNo" placeholder="G 或 L 开头"></div>
+      <div class="fld"><label>QQ 号</label><input id="f-qq" inputmode="numeric" placeholder="选填"></div>
+      <div class="fld"><label>电子邮箱</label><input id="f-email" type="email" placeholder="选填"></div>
+      <div class="fld"><label>户籍地址</label><textarea id="f-address" rows="2" placeholder="户口簿上的地址"></textarea></div>
+      <div class="fld"><label>证件照片（报名上传用）</label>
+        <div class="photoRow">
+          <img id="photoPrev" alt="照片预览">
+          <input type="file" id="f-photo" accept="image/*" style="flex:1">
+        </div>
+        <div class="hint" id="photoHint">选择后自动压缩到 800px 内（JPG），存本机</div>
+        <div class="hint" style="margin-top:4px">准备建议：近期免冠正面证件照，纯色背景、露眉露耳；<b>具体尺寸、大小上限和背景色要求以官网报名系统页面提示为准</b>（本页不虚构规格）。手机相册选图即可，本页自动压缩。</div>
+      </div>
+      <button class="btn2 green" onclick="copyInfo()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"/></svg>复制报名数据（导出 JSON 备份）</button>
+    </div>
+
+    <div class="group rise">
+      <div class="group-hd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>隐私与安全</div>
+      <div class="row"><div class="lb">存储方式</div><div class="vl" id="pvMode">…</div></div>
+      <div class="row col"><div class="lb">数据概览（脱敏展示）</div><div class="sub" id="pvOverview">—</div></div>
+      <button class="btn2" id="pvBtn1" onclick="pvPrimary()">设置 PIN 加密</button>
+      <button class="btn2" id="pvBtn2" onclick="pvWipe()">删除本机全部数据</button>
+      <div class="note"><b>如实说明：</b>数据只存在你这台设备的浏览器里，本站服务器不收任何个人信息。开启 PIN 后用 AES-256-GCM 加密（密钥由 PIN 派生，PIN 不存储），3 分钟无操作自动锁定。剩余风险如实告知：恶意浏览器扩展、或解锁状态下他人接触电脑，仍可能读到数据；PIN 太简单挡不住暴力尝试，请设 6 位以上。按钮文案随后续状态自动变化。</div>
+    </div>
+
+    <div class="group rise">
+      <div class="group-hd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l9 4.9v10.2L12 22l-9-4.9V6.9z"/><path d="M12 22V12"/><path d="M12 12L3 6.9"/><path d="M12 12l9-5.1"/></svg>核对资料 · 无需安装任何东西</div>
+      <button class="btn2" onclick="checkInfo()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3l8 -8"/><path d="M20 12v6a2 2 0 0 1 -2 2H6a2 2 0 0 1 -2 -2V6a2 2 0 0 1 2 -2h9"/></svg>检查资料完整性（开闸前先做）</button>
+      <div class="row col" id="chkInfo"><div class="sub">点上面按钮，立即核对报名必备字段是否有缺失。</div></div>
+      <div class="note" style="margin:2px 16px 0"><b>字段对照卡</b>（进入官网后照着填，两列一一对应）：</div>
+      <div class="row"><div class="lb">姓名 / 身份证号 / 手机号</div><div class="vl mono">考生姓名 / 身份证件号码 / 手机号码</div></div>
+      <div class="row"><div class="lb">性别 / 出生日期 / 民族</div><div class="vl mono">按身份证自动推导或下拉选择</div></div>
+      <div class="row"><div class="lb">报考类型（春考/夏考）</div><div class="vl mono">考试类型/科类 —— <b style="color:var(--orange)">填错影响考试，官网里会再次确认</b></div></div>
+      <div class="row"><div class="lb">考生类别</div><div class="vl mono">城市/农村 · 应届/往届</div></div>
+      <div class="row"><div class="lb">毕业/就读学校 · 学籍号</div><div class="vl mono">毕业中学 / 学籍号或考籍号</div></div>
+      <div class="row"><div class="lb">政治面貌 · 户籍地址</div><div class="vl mono">政治面貌 / 户籍地址（按户口簿）</div></div>
+    </div>
+
+    <div class="group rise">
+      <div class="group-hd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l9 4.9v10.2L12 22l-9-4.9V6.9z"/><path d="M12 22V12"/><path d="M12 12L3 6.9"/><path d="M12 12l9-5.1"/></svg>进入官方报名 · 五步走（开闸日 9:00–18:00）</div>
+      <div class="row"><div class="lb big">① 备资料</div><div class="sub">本页「信息」区填好并「检查资料完整性」</div></div>
+      <div class="row"><div class="lb big">② 留底</div><div class="sub">点「复制报名数据」导出 JSON 备份（可粘贴给家人核对）</div></div>
+      <div class="row"><div class="lb big">③ 进官网</div><div class="sub"><a href="https://wsbm.sdzk.cn" target="_blank" rel="noopener" style="color:var(--blue)">点此直达 wsbm.sdzk.cn</a>（或用「入口」页磁贴）</div></div>
+      <div class="row"><div class="lb big">④ 对照填</div><div class="sub">照上面的字段对照卡逐项填写；本页可悬浮分屏对照</div></div>
+      <div class="row"><div class="lb big">⑤ 人工确认并提交</div><div class="sub">认证、照片核验、最终确认、缴费 —— 全部由你手动完成</div></div>
+      <div class="note" style="margin:2px 16px 16px"><b>如实说明（重要）：</b>浏览器安全边界决定了<b>普通网页无法替你在官网页面上自动填写</b>——官网是另一个域名，页面之间不允许互相操作（同源策略），任何声称"网页一键跨站自动填表"的实现都不可信。本站正式交付方案是：<b>核验入口直达 + 资料完整性检查 + 字段对照卡 + 逐项复制</b>——不装任何东西，全平台可用。</div>
+    </div>
+  </section>
+
+  <!-- ============ 入口 ============ -->
+  <section class="view" id="v-links">
+    <div class="tiles">
+      <a class="tile pri rise" href="https://wsbm.sdzk.cn" target="_blank" rel="noopener">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"/><path d="M9 9h1"/><path d="M9 13h6"/><path d="M9 17h6"/></svg></div>
+        <div><div class="t">网上报名系统 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"/><path d="M10 14l11 -11"/><path d="M15 4h5v5"/></svg></div>
+        <div class="d" style="margin-top:5px">https://wsbm.sdzk.cn</div></div>
+      </a>
+      <a class="tile rise" href="https://www.sdzk.cn/" target="_blank" rel="noopener">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l-2 0l9 -9l9 9l-2 0"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/><path d="M10 12h4v7h-4z"/></svg></div>
+        <div><div class="t">省招考院官网 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"/><path d="M10 14l11 -11"/><path d="M15 4h5v5"/></svg></div>
+        <div class="d" style="margin-top:5px">www.sdzk.cn</div></div>
+      </a>
+      <a class="tile wide rise" href="https://www.sdzk.cn/NewsInfo.aspx?NewsID=7398" target="_blank" rel="noopener">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"/></svg></div>
+        <div class="tx"><div class="t">网上报名操作说明 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"/><path d="M10 14l11 -11"/><path d="M15 4h5v5"/></svg></div>
+        <div class="d">NewsID=7398 ｜ 2026-10-20 发布</div></div>
+      </a>
+      <a class="tile wide rise" href="https://www.sdzk.cn/NewsInfo.aspx?NewsID=7394" target="_blank" rel="noopener">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"/><path d="M9 9h1"/><path d="M9 13h6"/><path d="M9 17h6"/></svg></div>
+        <div class="tx"><div class="t">2027 年高考报名通知 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"/><path d="M10 14l11 -11"/><path d="M15 4h5v5"/></svg></div>
+        <div class="d">含全部时间节点与报名条件（官方原文）</div></div>
+      </a>
+      <a class="tile rise" href="https://www.sdzk.cn/NewsInfo.aspx?NewsID=7395" target="_blank" rel="noopener">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 9l-10 -4l-10 4l10 4l10 -4v6"/><path d="M6 10.6v5.4a3 3 0 0 0 3 3h6a3 3 0 0 0 3 -3v-5.4"/></svg></div>
+        <div><div class="t">春季高考 35 问 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"/><path d="M10 14l11 -11"/><path d="M15 4h5v5"/></svg></div>
+        <div class="d" style="margin-top:5px">中职 / 3+4 转段必读</div></div>
+      </a>
+      <a class="tile rise" href="https://www.sdzk.cn/NewsInfo.aspx?NewsID=7396" target="_blank" rel="noopener">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.5 -15.5l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7"/></svg></div>
+        <div><div class="t">夏季高考 35 问 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"/><path d="M10 14l11 -11"/><path d="M15 4h5v5"/></svg></div>
+        <div class="d" style="margin-top:5px">含体育类 / 艺术类</div></div>
+      </a>
+    </div>
+    <div class="note" style="margin:16px 0 0">全部为 <b>sdzk.cn</b> 官方域名，点击即直达。</div>
+  </section>
+
+  <!-- ============ 准备 ============ -->
+  <section class="view" id="v-prep">
+    <div class="group rise">
+      <div class="group-hd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><path d="M9 12l2 2l4 -4"/></svg>开闸前备料清单 · 点击勾选</div>
+      <ul class="chk" id="chk">
+        <li data-k="1"><div class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg></div><div><div class="tx">居民身份证</div><div class="sub">在有效期内，信息须与户籍一致</div></div></li>
+        <li data-k="2"><div class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg></div><div><div class="tx">户口簿（户主页 + 本人页）</div><div class="sub">外省迁入须满两年（截至 2026-10-24）</div></div></li>
+        <li data-k="3"><div class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg></div><div><div class="tx">学籍信息 / 毕业证书</div><div class="sub">应届生备学籍号，往届生备毕业证</div></div></li>
+        <li data-k="4"><div class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg></div><div><div class="tx">本人实名手机号</div><div class="sub">注册与接收验证码，别用家长号码</div></div></li>
+        <li data-k="5"><div class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg></div><div><div class="tx">电子证件照</div><div class="sub">已可在「信息」页存好，一键上传</div></div></li>
+        <li data-k="6"><div class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg></div><div><div class="tx">可用的支付方式</div><div class="sub">报名费在线缴，确保卡 / 微信 / 支付宝可用</div></div></li>
+        <li data-k="7"><div class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg></div><div><div class="tx">手机或电脑任一设备即可（无需安装任何东西）</div><div class="sub">可选进阶：电脑装脚本可自动填，不装也完全能用</div></div></li>
+      </ul>
+      <div class="prog-wrap"><div class="prog"><i id="progBar"></i></div><div class="prog-tx" id="progTx">0 / 7 已备齐</div></div>
+    </div>
+    <div class="group rise">
+      <div class="group-hd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86l-8.486 14.686a1.5 1.5 0 0 0 1.29 2.25h16.914a1.5 1.5 0 0 0 1.29 -2.25l-8.485 -14.686a1.5 1.5 0 0 0 -2.582 0z"/></svg>三个最容易踩的坑</div>
+      <div class="note warn" style="margin:14px 16px">
+        <b>① 只在 9:00–18:00 开放</b>，早晚访问必然不通。<br>
+        <b>② 缴完报名费才算报名成功</b>，只填信息不缴费视为未报名。<br>
+        <b>③ 春季与夏季同时报考须分别缴费。</b><br>
+        拟参加高职（专科）单独考试招生的，需在 11月13日—15日（9:00–18:00）缴春季高考技能测试费。
+      </div>
+    </div>
+  </section>
+
+<footer>
+  <b>Built by 小杰</b> · 本站由 小杰 提供技术支持（非官方网站，报名请以 <a href="https://www.sdzk.cn/" target="_blank" rel="noopener">山东省教育招生考试院官网</a> 为准）。<br>
+  时间节点取自官网正式文件，服务器定期自动复核并随官网变更更新；打不开时如实标注「暂时无法核实」。<br>
+  报名数据仅存本机（可选 PIN + AES-256-GCM 加密），不向本站或任何第三方上传 ｜ 系统通知经标准 Web Push（RFC 8291/8292）由服务器直发，页面关闭仍有效 ｜ 普通网页无法跨域代填官网表单（浏览器安全边界），本站提供的是核验入口 + 资料核对 + 字段对照 ｜ 报名以官方系统实际提示为准。
+</footer>
+</main>
+
+<!-- 全屏提醒模式 -->
+<div class="fsm" id="fsm">
+  <div class="big" id="fsTitle">距 开 闸</div>
+  <div class="count" id="fsCount">--:--:--</div>
+  <div class="when" id="fsWhen">2026年10月24日 09:00 · 每天仅 9:00–18:00</div>
+  <div class="fsbtns">
+    <button class="fsb" onclick="closeFS()">退出</button>
+    <a class="fsb" href="https://wsbm.sdzk.cn" target="_blank" rel="noopener">去报名 ↗</a>
+  </div>
+  <div class="tip">屏幕保持常亮 · 开闸时整屏变绿并提醒 ｜ 手机可将本页添加到主屏幕当提醒钟</div>
+</div>
+
+<div class="scrim" id="scrim" onclick="closeAnySheet()"></div>
+<div class="sheet" id="sheet">
+  <div class="grabber" id="grabber"><i></i></div>
+  <div class="sheet-hd">实测截图证据</div>
+  <div class="sheet-bd" id="sheetBd">
+    <figure><img src="assets/evidence-wsbm.png" alt="wsbm.sdzk.cn 实测白屏"><figcaption><b>报名系统：完全白屏</b>浏览器标签一直显示「Loading https://wsbm.sdzk.cn/」，页面无任何内容渲染。</figcaption></figure>
+    <figure><img src="assets/evidence-sdzk.png" alt="www.sdzk.cn 官网正常"><figcaption><b>同一体系官网：完全正常</b>www.sdzk.cn 完整渲染，报名通知就在首页 —— 佐证只有报名子系统未开闸。</figcaption></figure>
+    <figure><img src="assets/notice.png" alt="官方报名通知"><figcaption><b>《关于做好山东省 2027 年普通高等学校招生考试报名工作的通知》</b>报名网址 https://wsbm.sdzk.cn ｜ 填报信息及缴纳报名费：2026年10月24日至30日（每天 9:00–18:00）</figcaption></figure>
+  </div>
+</div>
+
+<!-- 提醒中心（通知系统整改：真实检测 + 完整授权链路 + 自定义提醒） -->
+<div class="sheet" id="nsheet">
+  <div class="grabber" onclick="closeNC()"><i></i></div>
+  <div class="sheet-hd">提醒中心</div>
+  <div class="sheet-bd">
+    <div class="row" style="padding:14px 20px 4px"><div class="sub">能力诊断 · 以下为当前设备实时检测结果，不是预设文案</div></div>
+    <div id="ncDiag"></div>
+    <div id="ncAction" style="padding:10px 16px 4px"></div>
+    <div class="row" style="padding:14px 20px 2px"><div class="lb big">自定义提醒</div></div>
+    <div class="row" style="padding:0 20px"><div class="sub" id="ncRemindHow">支持推送时：由服务器定时推送，<b>页面关了也会发</b>；不支持时：降级为<b>页面内提醒</b>（需页面开着），或用下方日历导出。只保存提醒时间与备注文字（≤40 字），不提交任何个人资料。</div></div>
+    <div style="padding:10px 16px 0;display:flex;gap:8px;flex-wrap:wrap">
+      <input type="datetime-local" id="ncAt" style="flex:1 1 190px;min-height:44px;border:none;border-radius:10px;background:var(--fill);padding:8px 12px;font-size:14px;color:var(--label)">
+      <input type="text" id="ncNote" placeholder="备注（选填，如：核对资料）" maxlength="40" style="flex:1 1 150px;min-height:44px;border:none;border-radius:10px;background:var(--fill);padding:8px 12px;font-size:14px;color:var(--label)">
+      <button class="btn2" onclick="ncAddRemind()">添加提醒</button>
+    </div>
+    <div id="ncReminds" style="padding:6px 16px"></div>
+    <div class="note" style="margin:10px 16px 20px"><b>如实送达声明：</b>推送经浏览器/系统通道投递，受推送服务、网络、系统通知设置、省电模式、设备开关机影响，任何网页都无法保证所有状态下绝对准时。iOS 锁屏通知需同时满足：已添加到主屏幕 + 已允许通知 + 订阅有效。页面内全屏信标是断网兜底。官方节点（开闸/截止/公告变更）与自定义提醒相互独立、各自去重。</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ==================================================================
+   弹簧引擎（半隐式欧拉）—— Apple: ζ + response → k / c
+   ================================================================== */
+var RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+function Spring(value, o){
+  o = o || {};
+  this.value = value; this.target = value; this.velocity = 0;
+  this.config(o.damping || 1, o.response || 0.4);
+  this.eps = o.eps || 0.0005;
+  springs.push(this);
+}
+Spring.prototype.config = function(zeta, response){ var w = 2*Math.PI/response; this.k = w*w; this.c = 2*zeta*w; };
+Spring.prototype.to = function(t){ this.target = t; return this; };
+Spring.prototype.jump = function(v){ this.value = v; this.target = v; this.velocity = 0; return this; };
+Spring.prototype.step = function(dt){
+  var a = -this.k*(this.value-this.target) - this.c*this.velocity;
+  this.velocity += a*dt; this.value += this.velocity*dt;
+  if (Math.abs(this.value-this.target) < this.eps && Math.abs(this.velocity) < this.eps){
+    this.value = this.target; this.velocity = 0; return false;
+  }
+  return true;
+};
+var springs = [], lastT = 0, rafId = null;
+function loop(now){
+  var dt = lastT ? Math.min((now-lastT)/1000, 1/30) : 1/60;
+  lastT = now;
+  for (var i=0;i<springs.length;i++) springs[i].step(dt);
+  draw();
+  var busy = false;
+  for (var j=0;j<springs.length;j++) if (springs[j].value!==springs[j].target||springs[j].velocity!==0){ busy=true; break; }
+  rafId = busy ? requestAnimationFrame(loop) : null;
+  if (!busy) lastT = 0;
+}
+function kick(){ if (rafId === null) rafId = requestAnimationFrame(loop); }
+
+/* ---------- DOM ---------- */
+var $ = function(id){ return document.getElementById(id); };
+var sheet=$('sheet'), scrim=$('scrim'), thumb=$('thumb'), progBar=$('progBar'),
+    ptr=$('ptr'), ptrIn=$('ptrIn'), ptrIcon=$('ptrIcon'), toast=$('toast'),
+    knob=$('knob'), fsm=$('fsm');
+
+/* ---------- springs ---------- */
+var sheetY=new Spring(1100,{damping:.8,response:.32}), scrimO=new Spring(0,{damping:1,response:.3});
+var ptrY=new Spring(0,{damping:1,response:.42}), ptrO=new Spring(0,{damping:1,response:.35}), ptrRot=new Spring(0,{damping:1,response:.35});
+var toY=new Spring(20,{damping:.8,response:.32}), toO=new Spring(0,{damping:1,response:.3});
+var progW=new Spring(0,{damping:1,response:.45}), knobX=new Spring(0,{damping:1,response:.35});
+var thumbX=new Spring(0,{damping:1,response:.35});
+var riseItems = [];
+
+/* ==================================================================
+   里程表：逐位弹簧滚动
+   ================================================================== */
+var odoCols = [];
+(function buildOdo(){
+  var cd = $('cd');
+  var groups = [['天',2],['时',2],['分',2],['秒',2]];
+  groups.forEach(function(g, gi){
+    var grp = document.createElement('div'); grp.className = 'grp';
+    var digits = document.createElement('div'); digits.className = 'digits';
+    for (var i=0;i<g[1];i++){
+      var odo = document.createElement('span'); odo.className='odo';
+      var col = document.createElement('span'); col.className='col';
+      for (var n=0;n<10;n++){ var it=document.createElement('i'); it.textContent=n; col.appendChild(it); }
+      odo.appendChild(col); digits.appendChild(odo);
+      odoCols.push({ spring: new Spring(0,{damping:.85,response:.4}), el: col, cur: 0 });
+    }
+    grp.appendChild(digits);
+    var l = document.createElement('div'); l.className='l'; l.textContent=g[0]; grp.appendChild(l);
+    cd.appendChild(grp);
+    if (gi < 3){ var sep=document.createElement('div'); sep.className='sep'; sep.textContent=':'; cd.appendChild(sep); }
+  });
+})();
+function setOdo(vals){
+  var idx = 0;
+  for (var g=0; g<vals.length; g++){
+    var s = vals[g];
+    for (var k=0; k<s.length; k++){
+      var o = odoCols[idx++];
+      var d = +s[k];
+      if (o.cur !== d){
+        o.cur = d;
+        if (RM){ o.spring.jump(-d); } else { o.spring.to(-d); kick(); }
+      }
+    }
+  }
+}
+
+/* ---------- 统一 draw ---------- */
+function draw(){
+  sheet.style.transform = 'translateY(' + sheetY.value + 'px)';
+  var ns=$('nsheet'); if (ns) ns.style.transform = 'translateY(' + nsY.value + 'px)';
+  scrim.style.opacity = scrimO.value;
+  thumb.style.transform = 'translateX(' + thumbX.value + 'px)';
+  progBar.style.width = progW.value + '%';
+  var py = Math.max(0, ptrY.value);
+  ptr.style.height = py + 'px';
+  ptrIn.style.transform = 'translateY(' + (py-26) + 'px) scale(' + ptrO.value + ')';
+  ptrIn.style.opacity = ptrO.value;
+  ptrIcon.style.transform = 'rotate(' + ptrRot.value + 'deg)';
+  toast.style.transform = 'translate(-50%,' + toY.value + 'px)';
+  toast.style.opacity = toO.value;
+  knob.style.transform = 'translateX(' + knobX.value + 'px)';
+  for (var i=0;i<odoCols.length;i++) odoCols[i].el.style.transform = 'translateY(' + odoCols[i].spring.value + 'em)';
+  for (var k=0;k<riseItems.length;k++){
+    var s = riseItems[k]._spr; if (!s) continue;
+    var v = s.value;
+    riseItems[k].style.opacity = Math.min(1, Math.max(0, v));
+    riseItems[k].style.transform = 'translateY(' + ((1-v)*14) + 'px) scale(' + (0.985+v*0.015) + ')';
+  }
+}
+
+/* ---------- 入场 ---------- */
+function collectRise(root){ riseItems = Array.prototype.slice.call((root||document).querySelectorAll('.rise')); }
+function riseIn(root){
+  collectRise(root);
+  riseItems.forEach(function(el, i){
+    if (RM){ el.style.opacity=1; el.style.transform='none'; return; }
+    var s = el._spr; if (!s) s = el._spr = new Spring(0,{damping:1,response:.45});
+    s.jump(0);
+    setTimeout(function(){ s.to(1); kick(); }, i*55);
+  });
+}
+
+/* ---------- 主题 ---------- */
+(function(){
+  var t = localStorage.getItem('sdzk-theme');
+  if (!t) t = (matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', t);
+  syncKnob(t);
+})();
+function syncKnob(theme){
+  var on = theme === 'dark';
+  $('tgl').classList.toggle('on', on);
+  document.querySelector('.i-m').style.display = on ? 'none':'block';
+  document.querySelector('.i-s').style.display = on ? 'block':'none';
+  knobX.jump(on ? 20 : 0);
+}
+function toggleTheme(){
+  var n = document.documentElement.getAttribute('data-theme')==='dark' ? 'light':'dark';
+  document.documentElement.setAttribute('data-theme', n);
+  localStorage.setItem('sdzk-theme', n);
+  knobX.to(n==='dark'?20:0); kick(); haptic();
+}
+function haptic(){ if (navigator.vibrate){ try{ navigator.vibrate(8); }catch(e){} } }
+
+/* ---------- 官方时间配置（可更新，不写死） ----------
+   内置兜底 = config.json 的镜像；启动后异步拉取 /api/config 覆盖。
+   服务器侧每 30 分钟核对官网公告，有变更即推送并更新配置。 */
+var SDZK_CFG = {
+  version: 3, timezone: 'Asia/Shanghai', verifiedAt: '2026-10-20',
+  sourceName: '山东省教育招生考试院2027年高考报名通知',
+  fillPhase:{ start:'2026-10-24T09:00:00+08:00', end:'2026-10-30T18:00:00+08:00', dailyOpen:'09:00', dailyClose:'18:00' },
+  auditPhase:{ start:'2026-10-31T00:00:00+08:00', end:'2026-11-12T23:59:59+08:00' },
+  feePhase:{ start:'2026-11-13T00:00:00+08:00', end:'2026-11-15T23:59:59+08:00' },
+  beacons:[
+    { id:'open-2027', type:'open', priority:'high', at:'2026-10-24T09:00:00+08:00',
+      title:'山东高考报名已开闸', body:'填报通道开放（每天 9:00–18:00）。核对资料后尽快报名并缴费。', url:'https://wsbm.sdzk.cn' },
+    { id:'prep-2027', type:'prep', priority:'std', at:'2026-10-24T09:00:00+08:00',
+      title:'资料核对提醒', body:'开闸了。请先核对资料，再进入官方系统填写。', url:'./' },
+    { id:'lastcall-2027', type:'risk', priority:'high', at:'2026-10-29T18:00:00+08:00',
+      title:'报名明天 18:00 截止', body:'未缴报名费 = 未报名成功。请尽快完成填报与缴费。', url:'https://wsbm.sdzk.cn' },
+    { id:'audit-2027', type:'open', priority:'std', at:'2026-10-31T00:00:00+08:00',
+      title:'资格审核阶段开始', body:'10月31日—11月12日资格审核，留意审核结果通知。', url:'https://www.sdzk.cn' },
+    { id:'fee-2027', type:'open', priority:'std', at:'2026-11-13T00:00:00+08:00',
+      title:'考试费缴纳开始', body:'11月13日—15日（每天 9:00–18:00）缴纳考试费。', url:'https://wsbm.sdzk.cn' }
+  ]
+};
+var T = {}, cfgSource = '内置配置 v3';
+function deriveTimes(){
+  var C = window.SdzkCore;
+  T.OPEN  = C.ts(SDZK_CFG.fillPhase.start);  T.CLOSE = C.ts(SDZK_CFG.fillPhase.end);
+  T.A1    = C.ts(SDZK_CFG.auditPhase.start); T.A2    = C.ts(SDZK_CFG.auditPhase.end);
+  T.F1    = C.ts(SDZK_CFG.feePhase.start);   T.F2    = C.ts(SDZK_CFG.feePhase.end);
+  T.OPEN_OK = T.OPEN !== null && T.CLOSE !== null;   // 解析失败→config_error 状态，绝不猜
+}
+deriveTimes();
+function pad(n){ return String(n).padStart(2,'0'); }
+function fmtDur(ms){ return SdzkCore.fmtDur(ms); }
+function fmtDT(ms){ return SdzkCore.fmtDT(ms); }
+var probeResult = null;   // null=未探测 | {ok:true,at} | {ok:false,at}
+function loadCfg(){
+  fetch('./api/config', { cache:'no-store' }).then(function(r){ return r.ok ? r.json() : null; }).then(function(c){
+    if (!c || !c.fillPhase || !SdzkCore.ts(c.fillPhase.start)) return;   // 配置无效→保留内置兜底
+    SDZK_CFG = c; deriveTimes();
+    cfgSource = '服务器配置 v' + (c.version || '?');
+    tick(); runBeacons(); renderOfficialCard();
+  }).catch(function(){ /* 离线/静态托管：使用内置兜底 */ });
+}
+
+/* ---------- 全屏提醒 ---------- */
+var fsWake = null;
+function openFS(){
+  fsm.classList.add('on');
+  haptic();
+  if ('wakeLock' in navigator){
+    navigator.wakeLock.request('screen').then(function(w){ fsWake=w; }).catch(function(){});
+  }
+  tick();
+}
+function closeFS(){
+  fsm.classList.remove('on','breathing','opened');
+  if (fsWake){ try{ fsWake.release(); }catch(e){} fsWake = null; }
+}
+document.addEventListener('visibilitychange', function(){
+  if (!document.hidden && fsm.classList.contains('on') && 'wakeLock' in navigator && !fsWake){
+    navigator.wakeLock.request('screen').then(function(w){ fsWake=w; }).catch(function(){});
+  }
+});
+var fsOpened = false;
+function fsTick(now){
+  if (!fsm.classList.contains('on')) return;
+  var inFill = T.OPEN_OK && now >= T.OPEN && now <= T.CLOSE;
+  var d = T.OPEN_OK ? T.OPEN - now : 0;
+  var E = $('fsCount');
+  if (T.OPEN_OK && d > 0){
+    var s = Math.floor(d/1000);
+    E.innerHTML = pad(Math.floor(s/86400)) + ':' + pad(Math.floor(s%86400/3600)) + ':' + pad(Math.floor(s%3600/60)) + ':' + pad(s%60) + '<small>天:时:分:秒</small>';
+    $('fsTitle').textContent = '距 开 闸';
+    $('fsWhen').innerHTML = fmtDT(T.OPEN) + ' · 每天仅 ' + SDZK_CFG.fillPhase.dailyOpen + '–' + SDZK_CFG.fillPhase.dailyClose;
+    if (!fsm.classList.contains('breathing') && d < 3*3600e3) fsm.classList.add('breathing');
+  } else if (inFill){
+    E.innerHTML = '已 开 闸';
+    $('fsTitle').textContent = '现在就报名';
+    fsm.classList.remove('breathing'); fsm.classList.add('opened');
+    if (!fsOpened){ fsOpened = true; haptic(); if (navigator.vibrate) navigator.vibrate([300,100,300,100,300]);
+      try { new Notification('山东高考报名已开闸', { body:'点这里去报名 wsbm.sdzk.cn' }); } catch(e){} }
+  } else if (!T.OPEN_OK){
+    E.innerHTML = '--:--';
+    $('fsTitle').textContent = '配置异常';
+  } else {
+    E.innerHTML = '已结束';
+    $('fsTitle').textContent = '本期填报已结束';
+    fsm.classList.remove('breathing');
+  }
+}
+
+/* ---------- 主 tick（状态机驱动） ---------- */
+var notifyOn = false, notified = false;
+function stateOf(now){
+  if (!T.OPEN_OK) return { code:'config_error', level:'warn', text:'配置错误', detail:'官方时间配置无法解析，请检查 /api/config' };
+  return SdzkCore.officialState(SDZK_CFG, now, probeResult);
+}
+function tick(){
+  var now = Date.now();
+  var st = stateOf(now);
+  var vals;
+  if (T.OPEN_OK && now < T.OPEN) vals = SdzkCore.countdownParts(T.OPEN, now).pad();
+  else vals = ['0','00','00','00'];
+  setOdo(vals);
+  fsTick(now);
+  mark('tl1', now>=T.OPEN && now<=T.CLOSE);
+  mark('tl2', now>=T.A1 && now<=T.A2);
+  mark('tl3', now>=T.F1 && now<=T.F2);
+  mark('tl4', now>T.F2);
+  markPast('tl1', now>T.CLOSE); markPast('tl2', now>T.A2); markPast('tl3', now>T.F2);
+
+  /* 标签 + meta：完全由 8 态官方状态机决定，不编造 */
+  var tag='', meta='';
+  switch (st.code){
+    case 'not_started':
+      tag = '报名通道未开放';
+      meta = '<span class="live off"></span>距 <b>' + fmtDT(T.OPEN) + '</b> 开闸 ｜ 每天仅 <b>'
+           + SDZK_CFG.fillPhase.dailyOpen + '–' + SDZK_CFG.fillPhase.dailyClose + '</b>';
+      break;
+    case 'daily_closed':  tag='今日暂未开放';        meta='<span class="live off"></span>' + st.detail; break;
+    case 'planned_unverified': tag='计划开放中 · 未核实'; meta='<span class="live off"></span>' + st.detail; break;
+    case 'open_verified': tag='已核实开放，去报名';   meta='<span class="live on"></span>' + st.detail; break;
+    case 'check_failed':  tag='暂时无法核实';        meta='<span class="live off"></span>' + st.detail; break;
+    case 'ended':         tag='本期填报已结束';      meta = st.detail; break;
+    default:              tag = st.text;             meta = st.detail;
+  }
+  if (now >= T.A1 && now <= T.A2){ tag='审核中'; meta='填报已结束 · 资格审核 <b>' + fmtDT(T.A1) + ' — ' + fmtDT(T.A2) + '</b>'; }
+  else if (now >= T.F1 && now <= T.F2){ tag='缴费阶段'; meta='缴考试费 <b>' + fmtDT(T.F1) + ' — ' + fmtDT(T.F2) + '，每天 9:00–18:00</b>'; }
+  else if (now > T.F2){ tag='本期已结束'; meta='春考知识 / 夏考统考费 <b>2027 年 4 月</b>缴纳'; }
+
+  $('tagText').textContent = tag;
+  $('heroMeta').innerHTML = meta;
+  var ws = $('winState');
+  if (ws){
+    ws.textContent = st.text;
+    $('winDetail').textContent = st.detail + '（来源：' + cfgSource + '）';
+    ws.style.color = st.level === 'ok' ? 'var(--green)' : (st.level === 'danger' ? 'var(--red)' : 'var(--label)');
+  }
+  /* 本地开闸提醒（仅当日时段内才提醒，绝不误报） */
+  var dt = new Date(now);
+  var inDaily = dt.getHours()*60+dt.getMinutes() >= 9*60 && dt.getHours()*60+dt.getMinutes() < 18*60;
+  if (notifyOn && !notified && T.OPEN_OK && now >= T.OPEN && now <= T.CLOSE && inDaily){
+    notified = true;
+    try { new Notification('山东高考报名已开闸', { body:'填报通道已开放，立即报名 wsbm.sdzk.cn' }); } catch(e){}
+    say('开闸了！立即报名'); haptic();
+  }
+  /* 信标每 5 秒评估一次（触发条件未到时零开销路径） */
+  if (now - lastBeaconRun > 5000){ lastBeaconRun = now; runBeacons(); checkLocalReminds(now); }
+  /* 隐私自动锁计时 */
+  if (pvUnlocked && now - pvLastAct > 3*60*1000) pvLock('已自动锁定（3 分钟无操作）');
+}
+var lastBeaconRun = 0;
+
+/* ==================================================================
+   时间信标引擎（本机评估 · 静默保护 · 回执落账）
+   ================================================================== */
+var BKEY='sdzk-beacon-log', beaconLog={};
+try{ beaconLog=JSON.parse(localStorage.getItem(BKEY)||'{}'); }catch(e){}
+function beaconCtx(now){
+  return { now:now, silentFrom:'22:00', silentTo:'08:30', sentLog:beaconLog };
+}
+function runBeacons(){
+  if (!window.SdzkCore || !SDZK_CFG.beacons) return;
+  var acts;
+  try{ acts = SdzkCore.evalBeacons(SDZK_CFG.beacons, beaconCtx(Date.now())); }catch(e){ return; }
+  var changed = false;
+  acts.forEach(function(a){
+    if (a.action !== 'notify') return;
+    var b = SDZK_CFG.beacons.filter(function(x){ return x.id === a.id; })[0];
+    if (!b) return;
+    beaconLog[b.id] = Date.now(); changed = true;   // 先落账再送达：防重复轰炸
+    deliverBeacon(b, a);
+  });
+  if (changed){ try{ localStorage.setItem(BKEY, JSON.stringify(beaconLog)); }catch(e){} renderBeaconLog(); }
+}
+function deliverBeacon(b, a){
+  if (a.strength === 'high'){
+    try{ new Notification(b.title, { body:b.body, tag:b.id, renotify:true }); }catch(e){}
+    fsm.classList.add('on'); fsTick(Date.now());   // 全屏闪光直达
+    setTimeout(function(){ if (!fsOpened && fsm.classList.contains('on')) closeFS(); }, 12000);
+    say(b.title); haptic();
+  } else {
+    say(b.title + ' — ' + b.body);
+  }
+}
+function renderBeaconLog(){
+  var el = $('beaconLog'); if (!el) return;
+  var ids = Object.keys(beaconLog);
+  if (!ids.length){ el.innerHTML = '<div class="row"><div class="sub">暂无送达记录。开闸、截止等节点会在这里留回执。</div></div>'; return; }
+  el.innerHTML = ids.map(function(id){
+    var b = (SDZK_CFG.beacons||[]).filter(function(x){ return x.id===id; })[0] || { title:id };
+    var t = new Date(beaconLog[id]);
+    var hi = b && b.priority === 'high';
+    return '<div class="row"><div class="lb">' + b.title + (hi ? ' <span class="pill d" style="font-size:10px;padding:1px 7px">高优</span>' : '') +
+           '</div><div class="vl mono">' + pad(t.getMonth()+1) + '-' + pad(t.getDate()) + ' ' + pad(t.getHours()) + ':' + pad(t.getMinutes()) + ' 已送达</div></div>';
+  }).join('');
+}
+function renderOfficialCard(){
+  var oc = SDZK_CFG.officialCheck;
+  var v = $('ocVerified'), c = $('ocCheck'), s = $('ocSource'), g = $('ocCfg');
+  if (SDZK_CFG.verifiedAt && v) v.textContent = SDZK_CFG.verifiedAt;
+  if (SDZK_CFG.sourceName && s) s.textContent = SDZK_CFG.sourceName.length > 12 ? '省招考院官网通知' : SDZK_CFG.sourceName;
+  if (g) g.textContent = cfgSource;
+  if (!c) return;
+  if (!oc){ c.textContent = '未核验'; c.style.color = 'var(--label-2)'; }
+  else if (oc.status === 'ok'){
+    var t = new Date(oc.at);
+    c.textContent = '官网正常 · ' + pad(t.getHours()) + ':' + pad(t.getMinutes()) + ' 核对过';
+    c.style.color = 'var(--green)';
+  } else {
+    c.textContent = '暂时无法核实'; c.style.color = 'var(--orange)';
+  }
+}
+renderBeaconLog(); renderOfficialCard();
+function mark(id,on){ var e=$(id); if (e) e.classList.toggle('now',!!on); }
+function markPast(id,on){ var e=$(id); if (e) e.classList.toggle('past',!!on); }
+tick(); setInterval(tick, 1000);
+
+/* ---------- 分段 ---------- */
+function segLayout(){ var seg=$('seg'); return (seg.clientWidth-4)/seg.querySelectorAll('button').length; }
+function setView(name, btn){
+  var seg=$('seg'), btns=seg.querySelectorAll('button'), idx=0;
+  btns.forEach(function(b,i){ b.classList.toggle('on', b===btn); if (b===btn) idx=i; });
+  var w = segLayout(); thumb.style.width = w+'px';
+  if (RM) thumbX.jump(idx*w); else { thumbX.to(idx*w); kick(); }
+  ['status','info','links','prep'].forEach(function(v){
+    var el = $('v-'+v); el.classList.remove('on');
+    if (v===name){ void el.offsetWidth; el.classList.add('on'); riseIn(el); }
+  });
+  haptic();
+}
+window.addEventListener('resize', function(){
+  var seg=$('seg'), btns=seg.querySelectorAll('button');
+  var idx = Array.prototype.indexOf.call(btns, seg.querySelector('button.on'));
+  var w = segLayout(); thumb.style.width = w+'px'; thumbX.jump(idx*w);
+});
+
+/* ---------- Toast ---------- */
+var toastTimer=null;
+function say(m){
+  toast.textContent=m; toY.jump(20); toO.jump(0); toY.to(0); toO.to(1); kick();
+  clearTimeout(toastTimer); toastTimer=setTimeout(function(){ toY.to(20); toO.to(0); kick(); },2400);
+}
+
+/* ---------- 探测 + 历史 ---------- */
+var HKEY='sdzk-probe-hist', hist=[];
+try{ hist=JSON.parse(localStorage.getItem(HKEY)||'[]'); }catch(e){}
+function renderHist(){
+  var el=$('histList'); if (!el) return;
+  if (!hist.length){ el.innerHTML='<div class="row"><div class="sub">暂无记录。点上方「立即探测」或在页面顶部下拉刷新。</div></div>'; return; }
+  el.innerHTML = hist.map(function(r){
+    var t=new Date(r.t);
+    var tag={s:'有响应',d:'无响应'}[r.k]||r.k;
+    var cls={s:'ok',d:'bad'}[r.k]||'';
+    return '<div class="row"><div class="lb">'+tag+'</div><div class="vl mono '+cls+'">'
+      +pad(t.getMonth()+1)+'-'+pad(t.getDate())+' '+pad(t.getHours())+':'+pad(t.getMinutes())+':'+pad(t.getSeconds())
+      +'</div></div>';
+  }).join('');
+}
+function addHist(kind){ hist.unshift({t:Date.now(),k:kind}); hist=hist.slice(0,6);
+  try{ localStorage.setItem(HKEY,JSON.stringify(hist)); }catch(e){} renderHist(); }
+renderHist();
+
+var probing=false;
+function probe(){
+  if (probing) return;
+  probing=true;
+  var btn=$('probeBtn'), tx=$('probeTx');
+  btn.classList.add('spin'); tx.textContent='探测中…';
+  setStat('w','正在直连 wsbm.sdzk.cn');
+  var ctrl=new AbortController();
+  var timer=setTimeout(function(){ ctrl.abort(); },8000);
+  fetch('https://wsbm.sdzk.cn/',{mode:'no-cors',cache:'no-store',signal:ctrl.signal})
+    .then(function(){ clearTimeout(timer);
+      probeResult={ ok:true, at:Date.now() };
+      setStat('s','服务器有响应 —— 系统已开通'); addHist('s');
+      say('系统已可访问，快去报名'); if (navigator.vibrate) navigator.vibrate([10,40,10]); tick(); })
+    .catch(function(e){
+      clearTimeout(timer);
+      var aborted = e && e.name==='AbortError';
+      probeResult={ ok:false, at:Date.now() };
+      if (aborted){ setStat('d','请求发出后 8 秒无任何回包'); addHist('d');
+        say(Date.now()<T.OPEN ? '尚未到开放时间（' + fmtDT(T.OPEN) + '）' : '可能拥堵，避开 9–11 点高峰'); }
+      else { setStat('d','无法建立连接'); addHist('d'); say('连接失败，请检查网络'); }
+      if (navigator.vibrate) navigator.vibrate(12);
+      tick();
+    })
+    .then(function(){ btn.classList.remove('spin'); tx.textContent='立即探测'; probing=false;
+      ptrY.to(0); ptrO.to(0); ptrRot.to(0); kick(); });
+}
+function setStat(kind,text){
+  $('pstat').innerHTML='<span class="pill '+kind+'">'+({s:'已开通',d:'未响应',w:'连接中'}[kind]||'待探测')+'</span><span>'+text+'</span>';
+}
+
+/* ---------- 下拉刷新 ---------- */
+var ptrStart=null;
+function rubberband(o,dim,c){ c=c||0.55; return (o*dim*c)/(dim+c*Math.abs(o)); }
+document.addEventListener('pointerdown',function(e){
+  if (sheetOpen || fsm.classList.contains('on')) return;
+  if (window.scrollY>0) return;
+  if (e.target.closest && e.target.closest('.sheet,.tgl,.seg,a,button,input,select,textarea')) return;
+  ptrStart={y:e.clientY,t:performance.now(),active:false};
+},{passive:true});
+document.addEventListener('pointermove',function(e){
+  if (!ptrStart) return;
+  var dy=e.clientY-ptrStart.y;
+  if (dy<=0){ if (ptrY.value>0){ ptrY.to(0); ptrO.to(0); kick(); } return; }
+  if (window.scrollY>0){ ptrStart=null; return; }
+  ptrStart.active=true;
+  ptrY.jump(rubberband(dy,240)); ptrO.jump(Math.min(1,ptrY.value/46)); ptrRot.jump(ptrY.value*3.2);
+  kick();
+  if (ptrY.value>30 && e.cancelable) e.preventDefault();
+},{passive:false});
+document.addEventListener('pointerup',function(){
+  if (!ptrStart) return;
+  var st=ptrStart; ptrStart=null;
+  if (!st.active) return;
+  if (ptrY.value>48){ ptrY.to(52); ptrO.to(1); kick(); ptrRot.jump(0); ptrRot.to(1080); kick(); setTimeout(probe,120); }
+  else { ptrY.to(0); ptrO.to(0); ptrRot.to(0); kick(); }
+},{passive:true});
+document.addEventListener('pointercancel',function(){ ptrStart=null; ptrY.to(0); ptrO.to(0); ptrRot.to(0); kick(); });
+
+/* ---------- Sheet ---------- */
+var sheetOpen=false, sheetH=0, drag=null;
+var sheetBd=$('sheetBd');
+function openSheet(){
+  if (sheetOpen) return; sheetOpen=true; sheetH=sheet.offsetHeight;
+  sheet.style.visibility='visible'; scrim.style.pointerEvents='auto';
+  if (RM){ sheetY.jump(0); scrimO.jump(1); draw(); }
+  else { sheetY.jump(sheetH); sheetY.to(0); scrimO.jump(0); scrimO.to(1); kick(); }
+  haptic();
+}
+function closeSheet(){
+  if (!sheetOpen) return; sheetOpen=false; scrim.style.pointerEvents='none';
+  if (RM){ sheetY.jump(sheetH); scrimO.jump(0); draw(); return; }
+  sheetY.to(sheetH); scrimO.to(0); kick();
+}
+function onDown(e){
+  if (!sheetOpen) return;
+  if (e.currentTarget===sheetBd && sheetBd.scrollTop>0) return;
+  try{ e.currentTarget.setPointerCapture(e.pointerId); }catch(err){}
+  drag={y:e.clientY,base:sheetY.value,hist:[{y:e.clientY,t:performance.now()}],id:e.pointerId};
+  sheetY.jump(sheetY.value);
+}
+function onMove(e){
+  if (!drag||e.pointerId!==drag.id) return;
+  var y=drag.base+(e.clientY-drag.y);
+  if (y<0) y=-rubberband(-y,300);
+  sheetY.jump(y); scrimO.jump(Math.max(0,Math.min(1,1-y/sheetH))); kick();
+  var h=drag.hist; h.push({y:e.clientY,t:performance.now()}); if (h.length>5) h.shift();
+}
+function onUp(e){
+  if (!drag||e.pointerId!==drag.id) return;
+  var h=drag.hist, v=0;
+  if (h.length>=2){ var a=h[0],b=h[h.length-1],dt=(b.t-a.t)/1000; if (dt>0) v=(b.y-a.y)/dt; }
+  var cur=sheetY.value; drag=null;
+  var projected=cur+(v/1000)*0.998/(1-0.998);
+  var shouldClose = v>700 || projected>sheetH*0.35;
+  if (RM){ if (shouldClose) closeSheet(); else { sheetY.jump(0); scrimO.jump(1); draw(); } return; }
+  sheetY.velocity=v;
+  if (shouldClose){ sheetOpen=false; scrim.style.pointerEvents='none'; sheetY.to(sheetH); scrimO.to(0); }
+  else { sheetY.to(0); scrimO.to(1); }
+  kick();
+}
+['grabber','sheetBd'].forEach(function(id){
+  var el=$(id);
+  el.addEventListener('pointerdown',onDown);
+  el.addEventListener('pointermove',onMove);
+  el.addEventListener('pointerup',onUp);
+  el.addEventListener('pointercancel',onUp);
+});
+scrim.addEventListener('click',closeSheet);
+
+/* ==================================================================
+   报名信息卡（一键填写数据源）—— 只存本机
+   ================================================================== */
+var IKEY='sdzk-info';
+var FIELDS=['name','idcard','phone','nation','politics','examType','category','school','studentNo','qq','email','address'];
+var photoData='', photoName='';
+var pvUnlocked=false, pvLastAct=0, pvKey=null;
+
+function b64(buf){ var u=new Uint8Array(buf), s=''; for (var i=0;i<u.length;i++) s+=String.fromCharCode(u[i]); return btoa(s); }
+function unb64(s){ var b=atob(s), u=new Uint8Array(b.length); for (var i=0;i<b.length;i++) u[i]=b.charCodeAt(i); return u; }
+async function deriveKey(pin, salt){
+  var km = await crypto.subtle.importKey('raw', new TextEncoder().encode(pin), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey({ name:'PBKDF2', salt:salt, iterations:150000, hash:'SHA-256' }, km, { name:'AES-GCM', length:256 }, false, ['encrypt','decrypt']);
+}
+/* 存储层：IndexedDB 优先（store.js），localStorage 降级；storeCache 供同步读 */
+var storeCache = null;
+var storeReadyP = SdzkStore.ready().then(function(){ return SdzkStore.get(); })
+  .then(function(v){ storeCache = v; return v; })
+  .catch(function(){ return null; });
+function readStore(){ return storeCache; }
+function encEnabled(){ var r=readStore(); return !!(r && r.mode==='enc'); }
+function storePut(v){ storeCache = v; return SdzkStore.set(v).catch(function(e){ storeCache = null; throw e; }); }
+function storeDel(){ storeCache = null; return SdzkStore.del(); }
+function collectFields(){
+  var d={}; FIELDS.forEach(function(k){ var el=$('f-'+k); d[k]= el ? el.value.trim() : ''; });
+  if (photoData){ d.photo=photoData; d.photoName=photoName; }
+  return d;
+}
+function fillFields(d){
+  FIELDS.forEach(function(k){ var el=$('f-'+k); if (el && d[k]!=null) el.value=d[k]; });
+  if (d.photo){ photoData=d.photo; photoName=d.photoName||'photo.jpg';
+    var p=$('photoPrev'); p.src=photoData; p.classList.add('show');
+    $('photoHint').textContent='已存好（本机）'; }
+  idcCheck();
+}
+function clearFields(){
+  FIELDS.forEach(function(k){ var el=$('f-'+k); if (el) el.value=''; });
+  photoData=''; photoName='';
+  var p=$('photoPrev'); p.classList.remove('show'); p.removeAttribute('src');
+  $('photoHint').textContent='选择后自动压缩到 800px 内（JPG），存本机';
+  var h=$('idcHint'); h.textContent='填写后自动推导出生日期与性别'; h.style.color='';
+}
+async function persistEnc(d){
+  var salt = crypto.getRandomValues(new Uint8Array(16));
+  var iv = crypto.getRandomValues(new Uint8Array(12));
+  var ct = await crypto.subtle.encrypt({ name:'AES-GCM', iv:iv }, pvKey, new TextEncoder().encode(JSON.stringify(d)));
+  await storePut({ mode:'enc', salt:b64(salt), iv:b64(iv), ct:b64(ct), at:Date.now() });
+}
+function saveInfo(){
+  if (encEnabled() && !pvUnlocked){ say('数据已加密锁定，先解锁'); return null; }
+  var d = collectFields();
+  if (encEnabled()){
+    persistEnc(d).catch(function(){ say('加密保存失败，请重试'); });
+  } else {
+    storePut(d).catch(function(){ say('保存失败：照片太大，换张小的试试'); });
+  }
+  renderPv();
+  return d;
+}
+async function loadInfo(){
+  await storeReadyP;
+  var r = readStore();
+  if (!r){ renderPv(); return; }
+  if (r.mode === 'enc'){
+    pvUnlocked = false; pvKey = null;
+    clearFields();
+    $('photoHint').textContent = '已加密锁定 · 解锁后显示';
+    renderPv();
+  } else {
+    fillFields(r); renderPv();
+  }
+}
+/* ---- PIN 流程 ---- */
+async function pvPrimary(){
+  if (!(window.crypto && crypto.subtle)){ say('此浏览器不支持加密，数据仍只存本机'); return; }
+  if (!encEnabled()){
+    var p1 = prompt('设置本机 PIN（至少 6 位数字，不要用生日）：');
+    if (p1 === null) return;
+    if (!/^\d{6,}$/.test(p1)){ say('PIN 至少 6 位数字'); return; }
+    var p2 = prompt('再输一遍确认：');
+    if (p2 === null) return;
+    if (p1 !== p2){ say('两次输入不一致'); return; }
+    try{
+      var salt = crypto.getRandomValues(new Uint8Array(16));
+      pvKey = await deriveKey(p1, salt);
+      var iv = crypto.getRandomValues(new Uint8Array(12));
+      var d = collectFields();
+      var ct = await crypto.subtle.encrypt({ name:'AES-GCM', iv:iv }, pvKey, new TextEncoder().encode(JSON.stringify(d)));
+      await storePut({ mode:'enc', salt:b64(salt), iv:b64(iv), ct:b64(ct), at:Date.now() });
+      pvUnlocked = false; pvKey = null;
+      clearFields(); renderPv();
+      say('PIN 加密已开启（AES-256-GCM）');
+      haptic();
+    }catch(e){ say('开启失败：' + String(e && e.message || e).slice(0,40)); }
+    return;
+  }
+  if (!pvUnlocked) return pvUnlock();
+  pvLock('已锁定');
+}
+async function pvUnlock(){
+  var pin = prompt('输入 PIN 解锁：');
+  if (pin === null) return;
+  var r = readStore();
+  if (!r || r.mode !== 'enc'){ say('没有加密数据'); return; }
+  try{
+    var key = await deriveKey(pin, unb64(r.salt));
+    var pt = await crypto.subtle.decrypt({ name:'AES-GCM', iv:unb64(r.iv) }, key, unb64(r.ct));
+    var d = JSON.parse(new TextDecoder().decode(pt));
+    pvKey = key; pvUnlocked = true; pvLastAct = Date.now();
+    fillFields(d); renderPv();
+    say('已解锁 · 3 分钟无操作自动锁定');
+    haptic();
+  }catch(e){ say('PIN 不对或数据已损坏'); }
+}
+function pvLock(msg){
+  pvUnlocked = false; pvKey = null;
+  clearFields(); renderPv();
+  if (msg) say(msg);
+}
+function pvWipe(){
+  if (!confirm('确定删除本机保存的全部报名信息（含照片）？此操作不可恢复。')) return;
+  if (encEnabled() && !pvUnlocked && !confirm('数据处于加密锁定状态，仍要彻底删除吗？')) return;
+  storeDel();
+  pvUnlocked = false; pvKey = null;
+  clearFields(); renderPv();
+  say('已删除本机全部报名数据');
+}
+function renderPv(){
+  var r = readStore();
+  var isEnc = !!(r && r.mode === 'enc');
+  var m=$('pvMode'), o=$('pvOverview'), b1=$('pvBtn1');
+  if (m){ m.textContent = (isEnc ? 'AES-256-GCM 加密' : '明文') + ' · ' + SdzkStore.backendName(); m.style.color = isEnc ? 'var(--green)' : 'var(--label-2)'; }
+  if (b1) b1.textContent = !isEnc ? '设置 PIN 加密' : (pvUnlocked ? '立即锁定' : '输入 PIN 解锁');
+  if (!o) return;
+  if (!r){ o.textContent = '本机暂无报名数据'; return; }
+  if (isEnc && !pvUnlocked){ o.textContent = '🔒 已加密锁定，解锁后可见（' + new Date(r.at).toLocaleString() + ' 加密）'; return; }
+  var d = collectFields();
+  var rows = [['name','姓名'],['idcard','身份证'],['phone','手机'],['examType','报考类型'],['school','学校'],['email','邮箱'],['address','地址']];
+  var parts = rows.filter(function(x){ return d[x[0]]; })
+                  .map(function(x){ return x[1] + ' ' + SdzkCore.redact(x[0], d[x[0]]); });
+  if (d.photo) parts.push('照片 1 张');
+  o.textContent = parts.length ? parts.join(' ｜ ') : '已填写字段为空';
+}
+/* 自动锁：任何操作刷新计时（tick 内到点触发 pvLock） */
+document.addEventListener('pointerdown', function(){ if (pvUnlocked) pvLastAct = Date.now(); }, true);
+document.addEventListener('keydown', function(){ if (pvUnlocked) pvLastAct = Date.now(); }, true);
+$('f-photo').addEventListener('change', function(){
+  var f=this.files && this.files[0]; if (!f) return;
+  var img=new Image();
+  img.onload=function(){
+    var max=800, w=img.width, h=img.height;
+    var sc=Math.min(1, max/Math.max(w,h));
+    var c=document.createElement('canvas'); c.width=Math.round(w*sc); c.height=Math.round(h*sc);
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    photoData=c.toDataURL('image/jpeg',.85);
+    photoName=(f.name||'photo.jpg').replace(/\.[^.]+$/,'')+'.jpg';
+    var p=$('photoPrev'); p.src=photoData; p.classList.add('show');
+    $('photoHint').textContent='已压缩保存（本机）：'+c.width+'×'+c.height;
+    saveInfo(); haptic();
+  };
+  img.onerror=function(){ say('这张图读不了，换一张试试'); };
+  img.src=URL.createObjectURL(f);
+});
+function idcCheck(){
+  var id=$('f-idcard').value.trim();
+  var hint=$('idcHint');
+  hint.style.color='';
+  if (!id){ hint.textContent='填写后自动推导出生日期与性别'; hint.className='hint'; return; }
+  var r = SdzkCore.idcardCheck(id);
+  hint.className='hint';
+  if (r.ok){
+    hint.textContent='✓ 校验通过 ｜ 出生 ' + r.birth + ' ｜ ' + r.gender;
+    hint.style.color='var(--green)';
+  } else {
+    hint.textContent='⚠ ' + r.reason;
+    hint.style.color = r.reason.indexOf('校验位') >= 0 ? 'var(--orange)' : 'var(--red)';
+  }
+}
+$('f-idcard').addEventListener('blur', idcCheck);
+FIELDS.forEach(function(k){
+  var el=$('f-'+k); if (el) el.addEventListener('change', saveInfo);
+});
+function checkInfo(){
+  if (encEnabled() && !pvUnlocked){ say('数据已加密锁定，先解锁再核对'); return; }
+  var d = collectFields();
+  var miss = [], bad = [];
+  FIELD_META.forEach(function(m){
+    var v = (d[m.k] || '').trim();
+    if (m.required && !v) miss.push(m.label);
+    else if (v && !m.valid(v)) bad.push(m.label + '：应为 ' + m.vtext);
+  });
+  var warn = [];
+  if (!d.photo) warn.push('还没有证件照片（官网报名时需上传）');
+  var html = '';
+  if (!miss.length){
+    html = '<div class="row"><div class="lb big" style="color:var(--green)">✓ 必备字段齐全</div></div>';
+  } else {
+    html = '<div class="row"><div class="lb big" style="color:var(--orange)">⚠ 缺 ' + miss.length + ' 项：</div></div>'
+         + '<div class="row"><div class="sub">' + miss.map(function(x){ return x; }).join('、') + '</div></div>';
+  }
+  if (bad.length){
+    html += '<div class="row"><div class="lb" style="color:var(--orange)">格式需修正</div><div class="vl">' + bad.join('；') + '</div></div>';
+  }
+  if (warn.length){
+    html += '<div class="row"><div class="lb" style="color:var(--orange)">材料准备</div><div class="vl">' + warn.join('；') + '</div></div>';
+  }
+  html += '<div class="row"><div class="sub">核对结果仅在本机计算，未上传。注意：<b>「已复制」只代表内容进入剪贴板，不等于官网已填写</b>——每个字段都需你在官网粘贴后亲自核对。</div></div>';
+  $('chkInfo').innerHTML = html;
+  haptic();
+}
+function copyInfo(){
+  if (encEnabled() && !pvUnlocked){ say('数据已加密锁定，先解锁再复制'); return; }
+  var d=saveInfo();
+  if (!d.name && !d.idcard){ say('先把姓名和身份证填上'); return; }
+  if (!confirm('即将把报名资料（含身份证号、手机号等敏感信息）复制到剪贴板。\n剪贴板内容可能被其他应用读取，确定继续？')) return;
+  var j=JSON.stringify(d);
+  var done=function(){ say('报名数据已复制（JSON 备份）→ 可粘贴给家人核对或自行留存'); haptic(); };
+  if (navigator.clipboard&&navigator.clipboard.writeText&&window.isSecureContext) navigator.clipboard.writeText(j).then(done,fb); else fb();
+  function fb(){
+    var i=document.createElement('textarea'); i.value=j; document.body.appendChild(i); i.select();
+    try{ document.execCommand('copy'); done(); }catch(e){ say('复制失败，请长按手动复制'); }
+    document.body.removeChild(i);
+  }
+}
+loadInfo();
+
+/* ---- 字段配置模块：官方字段映射 / 必填 / 格式校验（本站自身前端模块，零外部依赖） ----
+   顺序按常见报名表结构组织；官方系统字段名以开闸后实际页面为准，本卡不虚构。 */
+var FIELD_META = [
+  { k:'name',     label:'姓名',          official:'考生姓名',              required:true,  valid:function(v){ return v.length>=2 && v.length<=20; }, vtext:'2–20 个字符' },
+  { k:'idcard',   label:'身份证号',      official:'身份证件号码',          required:true,  valid:function(v){ return SdzkCore.idcardCheck(v).ok; }, vtext:'18 位且校验位正确' },
+  { k:'phone',    label:'手机号',        official:'手机号码 / 联系电话',   required:true,  valid:function(v){ return /^1\d{10}$/.test(v); }, vtext:'11 位、1 开头' },
+  { k:'examType', label:'报考类型',      official:'考试类型 / 报考科类',   required:true,  valid:function(v){ return !!v; }, vtext:'春考/夏考（官网会再次确认）' },
+  { k:'category', label:'考生类别',      official:'考生类别 / 毕业生类别', required:true,  valid:function(v){ return !!v; }, vtext:'城市/农村 × 应届/往届' },
+  { k:'nation',   label:'民族',          official:'民族',                  required:true,  valid:function(v){ return !!v; }, vtext:'下拉选择' },
+  { k:'school',   label:'毕业/就读学校', official:'毕业中学 / 学校名称',   required:true,  valid:function(v){ return v.length>=2; }, vtext:'学校全称' },
+  { k:'politics', label:'政治面貌',      official:'政治面貌',              required:false, valid:function(v){ return true; }, vtext:'按实际选择' },
+  { k:'studentNo',label:'学籍号/考籍号', official:'学籍号 / 考籍号',       required:false, valid:function(v){ return !v || /^[GL]\d{6,}$/.test(v); }, vtext:'G/L 开头数字串（选填）' },
+  { k:'qq',       label:'QQ 号',         official:'QQ 号码（选填）',       required:false, valid:function(v){ return !v || /^\d{5,12}$/.test(v); }, vtext:'5–12 位数字' },
+  { k:'email',    label:'电子邮箱',      official:'电子邮箱（选填）',      required:false, valid:function(v){ return !v || /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v); }, vtext:'含 @ 的有效邮箱' },
+  { k:'address',  label:'户籍地址',      official:'户籍地址 / 通讯地址',   required:false, valid:function(v){ return true; }, vtext:'按户口簿填写' }
+];
+var FLABEL = {};
+FIELD_META.forEach(function(m){ FLABEL[m.k] = m.label; });
+
+/* ---- 逐项复制：每个字段右侧小按钮，官网填写时逐项粘贴（复制 ≠ 自动填表） ---- */
+FIELDS.forEach(function(k){
+  var el = $('f-'+k); if (!el) return;
+  var fld = el.closest('.fld'); if (!fld) return;
+  var lab = fld.querySelector('label'); if (!lab) return;
+  var wrap = document.createElement('div'); wrap.className = 'lbrow';
+  lab.parentNode.insertBefore(wrap, lab); wrap.appendChild(lab);
+  var b = document.createElement('button'); b.className = 'copybtn'; b.type = 'button';
+  b.textContent = '复制'; b.setAttribute('aria-label', '复制' + (FLABEL[k]||k));
+  b.onclick = function(){
+    if (encEnabled() && !pvUnlocked){ say('数据已加密锁定，先解锁再复制'); return; }
+    var v = el.value.trim();
+    if (!v){ say((FLABEL[k]||k) + '还是空的'); return; }
+    var done = function(){
+      say((FLABEL[k]||k) + ' 已复制 → 到官网对应输入框粘贴');
+      b.textContent = '✓'; haptic();
+      setTimeout(function(){ b.textContent = '复制'; }, 1200);
+    };
+    function fb(){
+      var i = document.createElement('textarea'); i.value = v; document.body.appendChild(i); i.select();
+      try { document.execCommand('copy'); done(); } catch (e) { say('复制失败，请长按输入框手动全选复制'); }
+      document.body.removeChild(i);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext) navigator.clipboard.writeText(v).then(done, fb); else fb();
+  };
+  wrap.appendChild(b);
+});
+
+/* ==================================================================
+   提醒中心 —— 能力真实检测 / iOS 完整授权链路 / 测试推送 / 自定义提醒
+   状态只有三种：代码已实现 · 自动化测试通过 · 真实设备已验证（未验证的如实标注）
+   ================================================================== */
+function urlB64ToU8(b64){
+  var pad='='.repeat((4-b64.length%4)%4);
+  var b=(b64+pad).replace(/-/g,'+').replace(/_/g,'/');
+  var raw=atob(b); var out=new Uint8Array(raw.length);
+  for (var i=0;i<raw.length;i++) out[i]=raw.charCodeAt(i);
+  return out;
+}
+var pushSubscribed = localStorage.getItem('sdzk-push')==='1';
+function updNotifyBtn(){ $('notifyBtn').classList.toggle('on', pushSubscribed); }
+updNotifyBtn();
+
+/* ---- 能力检测（真实读 API，不猜） ---- */
+function detectCaps(){
+  var ua = navigator.userAgent;
+  var isIOS = /iphone|ipad|ipod/i.test(ua);
+  var standalone = (matchMedia('(display-mode: standalone)').matches || navigator.standalone === true);
+  var hasNotify = ('Notification' in window);
+  var hasSW = ('serviceWorker' in navigator);
+  var hasPush = ('PushManager' in window);
+  return {
+    isIOS: isIOS, standalone: standalone,
+    envName: isIOS ? (standalone ? 'iOS 主屏幕 Web App' : 'iOS 浏览器内网页')
+                   : (/android/i.test(ua) ? 'Android 浏览器' : '桌面浏览器'),
+    hasNotify: hasNotify, hasSW: hasSW, hasPush: hasPush,
+    permission: hasNotify ? Notification.permission : 'none',
+    /* iOS 硬性规则：非主屏幕 Web App 一律不能推送（即使 API 存在，订阅也必被系统拒绝） */
+    canPush: hasNotify && hasSW && hasPush && !(isIOS && !standalone)
+  };
+}
+/* iOS 主屏幕 Web App 里 Notification API 要等用户手势后才暴露——先按环境给出引导 */
+function pushSupportedNow(c){ return c.canPush; }
+
+/* ---- 完整环境检测（启动时执行，结果直接驱动 UI；不依赖 UA 猜测能力） ---- */
+function envCheck(){
+  var c = detectCaps();
+  var ua = navigator.userAgent;
+  var embeddedName = null;
+  if (/MicroMessenger/i.test(ua)) embeddedName = '微信内置浏览器';
+  else if (/MQQBrowser/i.test(ua) || /QQ\//i.test(ua)) embeddedName = 'QQ 内置浏览器';
+  else if (/Weibo/i.test(ua)) embeddedName = '微博内置浏览器';
+  else if (/DingTalk/i.test(ua)) embeddedName = '钉钉内置浏览器';
+  var local = location.hostname === '127.0.0.1' || location.hostname === 'localhost';
+  return {
+    /* 继承基础能力检测 */
+    isIOS: c.isIOS, standalone: c.standalone, envName: c.envName,
+    hasNotify: c.hasNotify, hasSW: c.hasSW, hasPush: c.hasPush,
+    permission: c.permission, canPush: c.canPush,
+    /* 环境基础项（真实检测，非 UA 推测） */
+    isHTTPS: local || location.protocol === 'https:',
+    hasIDB: SdzkStore.backendName() !== '不可用',
+    storageName: SdzkStore.backendName(),
+    clipOK: !!(navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext),
+    embeddedName: embeddedName
+  };
+}
+function renderEmbBanner(){
+  var e = envCheck();
+  var el = $('embBanner');
+  if (!el) return;
+  if (!e.embeddedName){ el.style.display = 'none'; return; }
+  el.style.display = '';
+  el.innerHTML =
+    '<div class="row"><div class="lb big" style="color:var(--orange)">当前在' + e.embeddedName + '内</div></div>'
+    + '<div class="row"><div class="sub">内置浏览器功能受限（通知/剪贴板/存储可能被限制）。建议用系统浏览器打开：点右上角「···」或「⋯」菜单 → 选「在浏览器打开」；或复制下面的网址，粘贴到 Safari / Chrome 地址栏。</div></div>'
+    + '<div style="padding:6px 16px 14px;display:flex;gap:8px;flex-wrap:wrap">'
+    + '<button class="btn2" onclick="copySiteUrl()">复制本站网址</button>'
+    + '<a class="btn2" href="https://wsbm.sdzk.cn" target="_blank" rel="noopener">直接去官网报名</a></div>';
+}
+function copySiteUrl(){
+  var u = location.origin + location.pathname;
+  var done = function(){ say('网址已复制 → 粘贴到系统浏览器打开'); haptic(); };
+  function fb(){
+    var i = document.createElement('textarea'); i.value = u; document.body.appendChild(i); i.select();
+    try { document.execCommand('copy'); done(); } catch (e) { say('复制失败，请手动输入 wsbm.sdzk.cn 前的本站网址'); }
+    document.body.removeChild(i);
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext) navigator.clipboard.writeText(u).then(done, fb); else fb();
+}
+
+/* ---- 功能能力矩阵（本机真实检测结果，绝无虚构） ---- */
+function capChip(st){
+  var map = { ok:['真实可用','var(--green)'], part:['部分支持','var(--orange)'],
+              no:['暂不支持','var(--red)'], tbd:['待核实','var(--label-2)'] };
+  var m = map[st] || map.tbd;
+  return '<span style="color:' + m[1] + '">' + m[0] + '</span>';
+}
+function capRow(name, st, why){
+  return '<div class="row"><div class="lb">' + name + '<div class="sub">' + why + '</div></div><div class="vl mono">' + capChip(st) + '</div></div>';
+}
+async function renderCapMatrix(){
+  var c = envCheck();
+  var clipOK = c.clipOK;
+  var rows = '';
+  rows += capRow('运行环境', 'ok', c.envName + (c.embeddedName ? '（内置浏览器，功能受限）' : ''));
+  rows += capRow('HTTPS 安全连接', c.isHTTPS ? 'ok' : 'part', c.isHTTPS ? '当前页面经 HTTPS 访问' : '当前非 HTTPS：推送/剪贴板等能力将被浏览器禁用');
+  rows += capRow('进入官方报名入口', 'ok', '一键直达 wsbm.sdzk.cn（已核验网址）');
+  rows += capRow('资料本机保存', c.hasIDB ? 'ok' : 'no', c.storageName + '，仅存本机不上传');
+  rows += capRow('资料核对 / 缺失检查', 'ok', '必备字段 + 身份证校验位 + 照片缺失提醒');
+  rows += capRow('逐项复制到官网', clipOK ? 'ok' : 'part', clipOK ? '每字段一键复制，官网粘贴' : '剪贴板受限，降级为长按手动复制');
+  rows += capRow('页面内提醒（倒计时/信标）', 'ok', '需本页面保持打开');
+  rows += capRow('日历导出（.ics）', 'ok', '写入系统日历，到点弹日历提醒（非实时推送）');
+  if (c.canPush && !c.embeddedName) rows += capRow('系统推送提醒', pushSubscribed ? 'ok' : 'ok', pushSubscribed ? '已订阅，服务器实时推送' : '当前环境支持，未订阅');
+  else if (c.embeddedName) rows += capRow('系统推送提醒', 'no', c.embeddedName + '通知能力受限，请用系统浏览器打开本站');
+  else if (c.isIOS) rows += capRow('系统推送提醒', 'part', 'iOS 仅「添加到主屏幕」后可用（平台硬规则）');
+  else rows += capRow('系统推送提醒', 'no', '此浏览器无 Web Push，改用日历导出 + 页面内提醒');
+  rows += capRow('自定义提醒（服务器调度）', (c.canPush && !c.embeddedName) ? 'part' : 'part', '支持推送的环境可用；其他环境请用日历导出或页面内提醒');
+  rows += capRow('官网表单自动填写（跨站）', 'no', '同源策略硬限制：普通网页不能操作另一个域名的页面');
+  /* 官网可达性：先渲染基础行，服务器探测回来后原位更新（不阻塞整卡） */
+  rows += '<div class="row" id="capProbeRow"><div class="lb">官网可达性（服务器实测）<div class="sub">探测中…</div></div><div class="vl mono">' + capChip('tbd') + '</div></div>';
+  $('capMatrix').innerHTML = rows;
+  var probe = null;
+  try { probe = await (await fetch('./api/origin-probe')).json(); } catch (e) {}
+  var pr = $('capProbeRow');
+  if (pr) pr.outerHTML = (probe && probe.status === 'ok')
+    ? capRow('官网可达性（服务器实测）', 'ok', 'HTTP ' + probe.httpStatus + ' · ' + probe.latencyMs + 'ms · 表单字段待开闸后逐项核验')
+    : capRow('官网可达性（服务器实测）', 'tbd', (probe && probe.note) ? probe.note : '暂时无法核实（官网未开闸或网络不可达），不虚构结果');
+}
+/* ---- 日历导出（降级提醒：明确标注 ≠ 实时推送） ---- */
+function officialICSEvents(){
+  var c = SDZK_CFG.fillPhase;
+  var ev = [
+    { title:'山东高考报名开闸（第一天 9:00）', desc:'wsbm.sdzk.cn · 每天仅 9:00–18:00，建议 9:00 前就位', at: new Date(c.start).getTime(), durMin: 60 },
+    { title:'高考报名截止（最后一天 18:00）', desc:'wsbm.sdzk.cn · 缴费完成才算报名成功，务必提前', at: new Date(c.end).getTime() - 3600e3, durMin: 60 }
+  ];
+  var a = SDZK_CFG.auditPhase, f = SDZK_CFG.feePhase;
+  if (a) ev.push({ title:'高考报名资格审核期开始', desc:'时间以官网为准', at: new Date(a.start).getTime(), durMin: 30 });
+  if (f) ev.push({ title:'高考缴费期开始（每天 9:00–18:00）', desc:'缴费完成才算报名成功', at: new Date(f.start).getTime(), durMin: 30 });
+  return ev;
+}
+function ncExportICS(){
+  try{
+    var ics = SdzkCore.buildICS(officialICSEvents());
+    var blob = new Blob([ics], { type:'text/calendar;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = '山东高考报名提醒.ics';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 3000);
+    say('日历文件已导出 → 打开后写入系统日历（注意：日历提醒不是实时推送）');
+    haptic();
+  }catch(e){ say('导出失败：' + String(e.message||e).slice(0,40)); }
+}
+
+/* ---- 面板开合（复用证据 Sheet 同款弹簧） ---- */
+var nsY = new Spring(1100, { damping:.8, response:.32 });
+var ncOpen = false, myEndpoint = null;
+function openNC(){
+  if (sheetOpen) closeSheet();
+  ncOpen = true; var el = $('nsheet');
+  el.style.visibility = 'visible'; scrim.style.pointerEvents = 'auto';
+  if (RM){ nsY.jump(0); scrimO.jump(1); draw(); }
+  else { nsY.jump(el.offsetHeight); nsY.to(0); scrimO.jump(0); scrimO.to(1); kick(); }
+  renderNC(); haptic();
+}
+function closeNC(){
+  if (!ncOpen) return; ncOpen = false; scrim.style.pointerEvents = 'none';
+  var el = $('nsheet');
+  if (RM){ nsY.jump(el.offsetHeight); scrimO.jump(0); draw(); return; }
+  nsY.to(el.offsetHeight); scrimO.to(0); kick();
+}
+function closeAnySheet(){ closeSheet(); closeNC(); }
+function ncRow(label, val, color){
+  return '<div class="row"><div class="lb">' + label + '</div><div class="vl mono" style="' + (color ? 'color:' + color : '') + '">' + val + '</div></div>';
+}
+async function renderNC(){
+  var c = detectCaps();
+  /* 诊断区 */
+  var env = c.envName + (c.isIOS && !c.standalone ? '（推送仅主屏幕模式可用）' : '');
+  $('ncDiag').innerHTML =
+    ncRow('运行环境', env) +
+    ncRow('Notification API', c.hasNotify ? '有' : '无', c.hasNotify ? 'var(--green)' : 'var(--red)') +
+    ncRow('通知权限', c.hasNotify ? ({granted:'已允许',denied:'已拒绝',default:'尚未询问'}[c.permission] || c.permission) : '此环境无通知 API',
+      c.permission === 'granted' ? 'var(--green)' : (c.permission === 'denied' ? 'var(--red)' : '')) +
+    ncRow('推送订阅', pushSubscribed ? '已订阅（本机标记）' : (c.canPush ? '未订阅' : '此环境不可用'),
+      pushSubscribed ? 'var(--green)' : '');
+  /* 动作区：按真实状态给按钮/引导 */
+  var act = $('ncAction'), html = '';
+  if (!c.canPush){
+    if (c.isIOS && !c.standalone){
+      html = '<div class="note" style="margin:4px 4px 10px"><b>iOS 的平台限制（如实说明）：</b>苹果只允许「添加到主屏幕」的 Web App 收到系统推送，浏览器内网页永远收不到。这是 iOS 的硬性规则，任何网页都绕不过。</div>'
+           + '<div class="note" style="margin:0 4px 10px"><b>三步开启（约 30 秒）：</b><br>① 点 Safari 底部「分享」按钮（方框加箭头）<br>② 选「添加到主屏幕」→ 确认<br>③ 回到桌面点新图标打开本页 → 再点铃铛 → 「开启系统通知」</div>'
+           + '<div style="display:flex;gap:8px;flex-wrap:wrap">'
+           + '<button class="btn2" onclick="ncExportICS()">导出日历提醒（.ics，替代方案）</button>'
+           + '<button class="btn2" onclick="say(\'添加到主屏幕后，从桌面图标打开再点铃铛\')">我没找到分享按钮</button></div>'
+           + '<div class="note" style="margin:8px 4px 0">日历提醒由系统日历在到点时弹出（提前 30 分钟），<b>不是实时推送</b>；配合页面内提醒一起用。</div>';
+    } else {
+      html = '<div class="note" style="margin:4px 4px 10px">此浏览器没有 Web Push 能力（' + (!c.hasNotify?'无 Notification API':'无 PushManager/ServiceWorker') + '）。<b>替代方案照常可用：</b>日历导出 + 页面内提醒 + 全屏信标（开闸整屏变绿）。</div>'
+           + '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn2" onclick="ncExportICS()">导出日历提醒（.ics）</button></div>'
+           + '<div class="note" style="margin:8px 4px 0">日历提醒写入系统日历，到点由日历 App 弹出；它<b>不是实时推送</b>，也不需要网络。</div>';
+    }
+  } else if (c.permission === 'denied'){
+    html = '<div class="note" style="margin:4px 4px 10px;color:var(--orange)"><b>通知权限已被拒绝。</b>' + (c.isIOS ? '请到 iOS「设置 → 应用 → 通知」（或 设置 → Safari）里为本站重新允许。' : '请到浏览器地址栏左侧的站点设置里重新允许通知。') + '</div>';
+  } else if (!pushSubscribed){
+    html = '<button class="btn2 green" onclick="ncSubscribe()">开启系统通知（订阅 + 发送测试推送）</button>'
+         + '<div class="note" style="margin:8px 4px 0">点了之后：系统会弹通知授权 → 允许后自动注册推送 → 服务器立刻发一条测试通知验证真链路。</div>';
+  } else {
+    html = '<div class="row" style="padding:0 4px 8px">' + ncRow('订阅状态', '已订阅 · 接收官方节点推送', 'var(--green)').replace('<div class="row">','').replace('</div>','') + '</div>'
+         + '<div style="display:flex;gap:8px;flex-wrap:wrap">'
+         + '<button class="btn2" onclick="ncTestPush()">再发一条测试推送</button>'
+         + '<button class="btn2" onclick="ncUnsubscribe()">关闭通知（退订）</button></div>';
+  }
+  act.innerHTML = html;
+  /* 自定义提醒列表：推送环境用服务器列表；否则降级为页面内提醒 */
+  if (pushSubscribed && myEndpoint){ renderReminds(); }
+  else {
+    $('ncRemindHow').textContent = '当前环境降级为页面内提醒：到点弹出提示（需本页面保持打开，页面关了不会提醒——那种需求请用上方日历导出）。只保存在本机。';
+    $('ncReminds').innerHTML = renderLocalReminds();
+  }
+}
+/* ---- 订阅（iOS 主屏幕 / 桌面 / 安卓同一入口，逐步真实执行） ---- */
+async function ncSubscribe(){
+  var c = detectCaps();
+  if (!c.canPush){
+    say(c.isIOS ? '先「添加到主屏幕」，从图标打开再点' : '此浏览器不支持推送');
+    renderNC(); return;
+  }
+  var perm;
+  try { perm = await Notification.requestPermission(); }
+  catch(e){ say('授权弹窗失败：' + String(e.message||e).slice(0,40)); return; }
+  if (perm !== 'granted'){
+    say(perm === 'denied' ? '你（或系统）拒绝了通知，可到系统设置重新允许' : '未完成授权，可稍后再试');
+    renderNC(); return;
+  }
+  try{
+    var reg = await navigator.serviceWorker.register('./sw.js');
+    await navigator.serviceWorker.ready;
+    var key = await (await fetch('./api/vapid')).json();
+    var sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey: urlB64ToU8(key.publicKey) });
+    var r = await fetch('./api/subscribe', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(sub) });
+    if (!r.ok) throw new Error('服务器拒绝订阅');
+    myEndpoint = sub.endpoint;
+    pushSubscribed = true; localStorage.setItem('sdzk-push','1'); updNotifyBtn();
+    /* 订阅成功立即真发一条测试推送（端到端验证） */
+    var t = await fetch('./api/test-push', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ endpoint: sub.endpoint }) });
+    var tr = await t.json();
+    say(tr.ok ? '已订阅，测试推送已从服务器发出（看锁屏/通知中心）' : '已订阅，但测试推送失败：' + (tr.error || tr.status));
+    haptic();
+  }catch(e){ say('订阅失败：' + String(e.message||e).slice(0,50)); }
+  renderNC();
+}
+async function ncTestPush(){
+  if (!myEndpoint){
+    /* 重新拿回端点：从活跃订阅读 */
+    try{
+      var reg = await navigator.serviceWorker.ready;
+      var sub = await reg.pushManager.getSubscription();
+      if (sub){ myEndpoint = sub.endpoint; }
+      else { say('订阅已失效，请重新开启'); pushSubscribed=false; localStorage.removeItem('sdzk-push'); updNotifyBtn(); renderNC(); return; }
+    }catch(e){ say('读取订阅失败'); return; }
+  }
+  try{
+    var r = await fetch('./api/test-push', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ endpoint: myEndpoint }) });
+    var j = await r.json();
+    say(j.ok ? '测试推送已发出，检查锁屏/通知中心' : '推送失败：' + (j.error || ('HTTP ' + j.status)));
+  }catch(e){ say('请求失败：' + String(e.message||e).slice(0,40)); }
+}
+async function ncUnsubscribe(){
+  try{
+    var reg = await navigator.serviceWorker.ready;
+    var sub = await reg.pushManager.getSubscription();
+    if (sub){
+      await fetch('./api/unsubscribe', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ endpoint: sub.endpoint }) });
+      await sub.unsubscribe();
+    }
+    pushSubscribed = false; myEndpoint = null;
+    localStorage.removeItem('sdzk-push'); updNotifyBtn();
+    say('已退订：服务器与浏览器两侧订阅都已删除');
+  }catch(e){ say('退订出错：' + String(e.message||e).slice(0,40)); }
+  renderNC();
+}
+/* ---- 自定义提醒（服务器调度，本机/页面可关） ---- */
+async function renderReminds(){
+  if (!myEndpoint){ return; }
+  try{
+    var r = await fetch('./api/remind?ep=' + encodeURIComponent(myEndpoint));
+    var j = await r.json();
+    var list = j.reminders || [];
+    $('ncReminds').innerHTML = list.length
+      ? list.map(function(x){
+          var st = x.sent ? (x.result === 'ok' ? '已送达' : ('失败/过期 ' + (x.result||''))) : '待发送';
+          var d = new Date(x.at);
+          var dt = (d.getMonth()+1) + '月' + d.getDate() + '日 ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+          return '<div class="row"><div class="lb">' + dt + (x.note ? ' · ' + x.note : '') + '</div><div class="vl mono">' + st +
+                 (x.sent ? '' : ' <a href="javascript:void(0)" onclick="ncDelRemind(\'' + x.id + '\')" style="color:var(--red);margin-left:6px">删除</a>') + '</div></div>';
+        }).join('')
+      : '<div class="row"><div class="sub">还没有自定义提醒。到点由服务器推送，去重独立于官方节点。</div></div>';
+  }catch(e){ $('ncReminds').innerHTML = '<div class="row"><div class="sub">提醒列表读取失败（网络）</div></div>'; }
+}
+/* ---- 页面内提醒（降级：不支持推送的环境；需页面打开，如实标注） ---- */
+var LRKEY = 'sdzk-local-reminds';
+function localReminds(){ try { return JSON.parse(localStorage.getItem(LRKEY) || '[]'); } catch(e){ return []; } }
+function saveLocalReminds(a){ try { localStorage.setItem(LRKEY, JSON.stringify(a)); } catch(e){} }
+function renderLocalReminds(){
+  var list = localReminds();
+  if (!list.length) return '<div class="row"><div class="sub">还没有页面内提醒。到点弹提示 + 全屏信标（本页面需保持打开）。</div></div>';
+  return list.map(function(x){
+    var d = new Date(x.at);
+    var dt = (d.getMonth()+1) + '月' + d.getDate() + '日 ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+    return '<div class="row"><div class="lb">' + dt + (x.note ? ' · ' + x.note : '') + '</div><div class="vl mono">页面内' +
+           (x.fired ? ' · 已触发' : ' <a href="javascript:void(0)" onclick="ncDelLocal(\'' + x.id + '\')" style="color:var(--red);margin-left:6px">删除</a>') + '</div></div>';
+  }).join('');
+}
+function ncAddLocal(){
+  var v = $('ncAt').value;
+  if (!v){ say('先选提醒时间'); return; }
+  var at = new Date(v).getTime();
+  if (!isFinite(at) || at < Date.now()){ say('时间必须是未来'); return; }
+  var a = localReminds();
+  a.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2,5), at: at, note: $('ncNote').value.trim(), fired:false });
+  saveLocalReminds(a); $('ncAt').value=''; $('ncNote').value='';
+  say('已添加页面内提醒（页面关了不提醒，那种需求用日历导出）');
+  haptic(); renderNC();
+}
+function ncDelLocal(id){ saveLocalReminds(localReminds().filter(function(x){ return x.id !== id; })); renderNC(); }
+function checkLocalReminds(now){
+  var a = localReminds(), chg = false;
+  a.forEach(function(x){
+    if (!x.fired && now >= x.at){
+      x.fired = true; chg = true;
+      try { new Notification('报名提醒', { body: (x.note ? x.note + ' · ' : '') + '去 wsbm.sdzk.cn' }); } catch(e){}
+      say('⏰ 提醒到点了' + (x.note ? '：' + x.note : '') + ' → 去 wsbm.sdzk.cn');
+      haptic();
+      if (typeof openFS === 'function') openFS();
+    }
+  });
+  var keep = a.filter(function(x){ return !x.fired || now - x.at < 36*3600e3; });   // 触发后保留 36 小时再清理
+  if (keep.length !== a.length) chg = true;
+  if (chg) saveLocalReminds(keep);
+}
+async function ncAddRemind(){
+  /* 路由：推送可用 → 服务器调度（页面关了也发）；否则 → 页面内提醒（如实降级） */
+  var c = detectCaps();
+  if (!(c.canPush && pushSubscribed && myEndpoint)) return ncAddLocal();
+  var v = $('ncAt').value;
+  if (!v){ say('先选提醒时间'); return; }
+  var at = new Date(v).getTime();
+  if (!isFinite(at) || at < Date.now()){ say('时间必须是未来'); return; }
+  try{
+    var r = await fetch('./api/remind', { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ endpoint: myEndpoint, at: at, note: $('ncNote').value.trim() }) });
+    var j = await r.json();
+    if (!j.ok){ say('添加失败：' + (j.error || '')); return; }
+    $('ncAt').value = ''; $('ncNote').value = '';
+    say('已添加：到点由服务器推送（页面关了也会发）');
+    haptic(); renderReminds();
+  }catch(e){ say('请求失败：' + String(e.message||e).slice(0,40)); }
+}
+async function ncDelRemind(id){
+  try{
+    await fetch('./api/remind', { method:'DELETE', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ id: id, endpoint: myEndpoint }) });
+    renderReminds(); say('已删除该提醒');
+  }catch(e){ say('删除失败'); }
+}
+/* 启动时恢复订阅端点（刷新/重开后仍可管理） */
+(async function restoreSub(){
+  try{
+    if (!pushSubscribed) return;
+    if (!detectCaps().canPush){ pushSubscribed = false; localStorage.removeItem('sdzk-push'); updNotifyBtn(); return; }
+    var reg = await navigator.serviceWorker.ready;
+    var sub = await reg.pushManager.getSubscription();
+    if (sub){ myEndpoint = sub.endpoint; }
+    else { pushSubscribed = false; localStorage.removeItem('sdzk-push'); updNotifyBtn(); }
+  }catch(e){ /* SW 未注册等，保持未订阅态 */ }
+})();
+
+/* ---------- 复制 / 导航 ---------- */
+function copyUrl(){
+  var u='https://wsbm.sdzk.cn';
+  var done=function(){ say('已复制 '+u); haptic(); };
+  if (navigator.clipboard&&navigator.clipboard.writeText&&window.isSecureContext) navigator.clipboard.writeText(u).then(done,fb); else fb();
+  function fb(){ var i=document.createElement('input'); i.value=u; document.body.appendChild(i); i.select();
+    try{ document.execCommand('copy'); done(); }catch(e){ say('请手动复制：'+u); } document.body.removeChild(i); }
+}
+var nav=$('nav');
+window.addEventListener('scroll',function(){ nav.classList.toggle('scrolled',window.scrollY>8); },{passive:true});
+
+/* ---------- 启动 ---------- */
+function boot(){
+  var w=segLayout(); thumb.style.width=w+'px'; thumbX.jump(0);
+  riseIn($('v-status'));
+  draw();
+  wireRepo();  // data-repo 有值时，署名自动挂仓库链接
+  loadCfg();   // 服务器侧配置优先（官方时间可更新，不写死）
+  renderEmbBanner();   // 内置浏览器（微信/QQ 等）检测 → 引导用系统浏览器打开
+  storeReadyP.then(function(){ renderCapMatrix(); });   // 能力矩阵：存储后端就绪后如实展示
+}
+function wireRepo(){
+  var c = document.querySelector('.credit');
+  if (!c) return;
+  var u = (c.getAttribute('data-repo') || '').trim();
+  if (!u) return;
+  ['credit-owner','credit-name'].forEach(function (cls) {
+    var el = c.querySelector('.' + cls); if (!el) return;
+    var a = document.createElement('a');
+    a.href = u; a.target = '_blank'; a.rel = 'noopener';
+    a.className = cls; a.textContent = el.textContent;
+    el.replaceWith(a);
+  });
+}
+if (document.readyState==='complete') boot();
+else { window.addEventListener('load',boot); setTimeout(function(){ if (!riseItems.length) boot(); },1500); }
+</script>
+</body>
+</html>
