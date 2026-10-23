@@ -1,0 +1,4 @@
+[self-test] aes128gcm 加密往返通过（rs=4096 keyid=65）
+[sdzk-portal] listening on :3010 ｜ 订阅数 0
+[sdzk-portal] 开闸推送时刻 2026-10-24T01:00:00.000Z
+[official] 核验成功 hash=9bde9c4471db3c6e（疑似变更，待下轮确认）

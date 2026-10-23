@@ -1,0 +1,296 @@
+// ==UserScript==
+// @name         山东高考报名 · 一键填写
+// @namespace    sdzk-quickfill
+// @version      1.0.0
+// @description  在 wsbm.sdzk.cn 报名页一键填充报名信息、自动上传照片。数据来自「山东高考报名面板」导出的报名数据（仅存本机）。配套开源用户脚本管理器：Violentmonkey / Tampermonkey。
+// @author       sdzk-portal
+// @match        https://wsbm.sdzk.cn/*
+// @match        http://wsbm.sdzk.cn/*
+// @grant        GM_setValue
+// @grant        GM_getValue
+// @grant        GM_deleteValue
+// @run-at       document-idle
+// @noframes     false
+// ==/UserScript==
+
+(function () {
+  'use strict';
+
+  /* ================= 字段识别规则 =================
+     按输入控件的 name / id / placeholder / 关联 label 文本做关键词匹配。
+     关键词越具体越优先；社保类站点常见命名都覆盖了。 */
+  const RULES = [
+    { k: 'name',     keys: ['考生姓名', '姓名'],                       fill: d => d.name },
+    { k: 'idcard',   keys: ['身份证号', '身份证明号码', '身份证件号码', '证件号码', '身份证', '证件号'], fill: d => d.idcard },
+    { k: 'phone',    keys: ['手机号码', '移动电话', '手机号', '手机', '联系电话', '联系方式', '电话'], fill: d => d.phone },
+    { k: 'school',   keys: ['毕业学校', '就读学校', '学校名称', '毕业中学', '学校'], fill: d => d.school },
+    { k: 'studentNo',keys: ['学籍号', '考籍号', '辅学号'],             fill: d => d.studentNo },
+    { k: 'qq',       keys: ['qq号码', 'qq号', 'qq'],                   fill: d => d.qq },
+    { k: 'email',    keys: ['电子邮箱', '电子邮件', '邮箱', '邮件'],   fill: d => d.email },
+    { k: 'address',  keys: ['户籍地址', '通讯地址', '家庭住址', '住址', '地址'], fill: d => d.address },
+    { k: 'birth',    keys: ['出生日期', '出生年月', '出生'],           fill: d => birthFromId(d.idcard) },
+    { k: 'gender',   keys: ['性别'],                                   fill: d => genderFromId(d.idcard) },
+    { k: 'nation',   keys: ['民族'],                                   fill: d => d.nation, select: true },
+    { k: 'politics', keys: ['政治面貌'],                               fill: d => d.politics, select: true },
+    { k: 'examType', keys: ['报考类型', '考试类型', '报考科类', '科类'], fill: d => d.examType, select: true },
+    { k: 'category', keys: ['考生类别', '毕业生类别', '类别'],         fill: d => d.category, select: true },
+    { k: 'milk',     keys: ['籍贯'],                                   fill: d => d.nativePlace },
+  ];
+
+  /* ================= 工具 ================= */
+  const idc = () => (data().idcard || '');
+  function birthFromId(id) {
+    if (!/^\d{17}[\dXx]$/.test(id)) return '';
+    return id.slice(6, 10) + '-' + id.slice(10, 12) + '-' + id.slice(12, 14);
+  }
+  function genderFromId(id) {
+    if (!/^\d{17}[\dXx]$/.test(id)) return '';
+    return (+id[16]) % 2 === 1 ? '男' : '女';
+  }
+  const data = () => { try { return JSON.parse(GM_getValue('sdzkData', '{}')); } catch (e) { return {}; } };
+  const saveData = d => GM_setValue('sdzkData', d);
+
+  function norm(s) { return (s || '').replace(/\s+/g, '').toLowerCase(); }
+  function labelOf(el) {
+    // 关联 label 的多种方式
+    let t = '';
+    if (el.id) { const l = document.querySelector('label[for="' + CSS.escape(el.id) + '"]'); if (l) t += l.textContent; }
+    const wrap = el.closest('label'); if (wrap) t += wrap.textContent;
+    let p = el.parentElement, hop = 0;
+    while (p && hop < 3) {
+      const l = p.querySelector('label'); if (l && !l.contains(el)) t += l.textContent;
+      t += (p.previousElementSibling && p.previousElementSibling.textContent) || '';
+      p = p.parentElement; hop++;
+    }
+    if (el.getAttribute('aria-label')) t += el.getAttribute('aria-label');
+    return norm(t);
+  }
+  function tagOf(el) { return norm([el.name, el.id, el.placeholder].join('|')); }
+  function matchField(el) {
+    const hay = tagOf(el) + '|' + labelOf(el);
+    let best = null, bestLen = 0;
+    for (const r of RULES) {
+      for (const kw of r.keys) {
+        if (hay.includes(norm(kw)) && kw.length > bestLen) { best = r; bestLen = kw.length; }
+      }
+    }
+    return best;
+  }
+  function fillableInputs() {
+    return Array.from(document.querySelectorAll('input, textarea, select')).filter(el => {
+      const t = (el.type || '').toLowerCase();
+      if (el.disabled || el.readOnly) return false;
+      if (['hidden', 'submit', 'button', 'reset', 'image', 'checkbox', 'radio', 'file'].includes(t)) return false;
+      if (el.tagName === 'SELECT') return true;
+      return true;
+    });
+  }
+  function fire(el) {
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+    el.dispatchEvent(new Event('blur', { bubbles: true }));
+  }
+  function setSelect(el, val) {
+    if (!val) return false;
+    const v = norm(val);
+    for (const o of el.options) {
+      if (norm(o.textContent).includes(v) || norm(o.value) === v) { el.value = o.value; return true; }
+    }
+    return false;
+  }
+  function mark(el, ok) {
+    el.style.transition = 'box-shadow .25s, border-color .25s';
+    el.style.boxShadow = ok ? '0 0 0 2px rgba(52,199,89,.55)' : '0 0 0 2px rgba(255,149,0,.6)';
+    setTimeout(() => { el.style.boxShadow = ''; }, 2600);
+  }
+
+  /* ================= 核心动作 ================= */
+  function quickFill() {
+    const d = data();
+    if (!d.name && !d.idcard && !d.phone) { toast('还没有报名数据，先点「导入面板数据」'); return; }
+    let ok = 0; const missed = [];
+    const used = new Set();
+    for (const el of fillableInputs()) {
+      if (used.has(el)) continue;
+      const r = matchField(el);
+      if (!r || used.has(r.k)) continue;
+      const val = r.fill(d);
+      if (!val) continue;
+      let done = false;
+      if (el.tagName === 'SELECT') done = setSelect(el, val);
+      else {
+        // 某些站点用只读+日历控件填出生日期，仍写值（失败也无害）
+        el.value = val; done = true;
+      }
+      if (done) { fire(el); mark(el, true); used.add(r.k); used.add(el); ok++; }
+    }
+    // 出生日期/性别若站上是 select 年/月/日 结构，兜底尝试
+    toast('已填充 ' + ok + ' 项' + (ok ? '，绿框为已填' : '') + '，请人工核对后提交');
+    if (ok === 0) toast('没匹配到字段？页面结构可能不同，把字段名反馈给面板');
+  }
+
+  async function quickUpload() {
+    const d = data();
+    if (!d.photo) { toast('面板里还没有照片'); return; }
+    const inputs = Array.from(document.querySelectorAll('input[type=file]')).filter(i => !i.disabled);
+    if (!inputs.length) { toast('页面上没找到文件上传框'); return; }
+    const blob = await (await fetch(d.photo)).blob();
+    let n = 0;
+    for (const input of inputs) {
+      try {
+        const file = new File([blob], d.photoName || 'photo.jpg', { type: blob.type || 'image/jpeg' });
+        const dt = new DataTransfer(); dt.items.add(file);
+        input.files = dt.files;
+        fire(input); mark(input, true); n++;
+      } catch (e) { /* 某些自定义上传组件不接受脚本注入 */ }
+    }
+    toast(n ? ('已上传照片到 ' + n + ' 个框，请确认预览') : '上传框拒绝了注入，请手动选一次照片');
+  }
+
+  async function importFromClipboard() {
+    try {
+      const txt = await navigator.clipboard.readText();
+      const d = JSON.parse(txt);
+      if (!d || (!d.name && !d.idcard)) { toast('剪贴板内容不是面板导出的报名数据'); return; }
+      saveData(d); renderSummary(); toast('导入成功 ✓ 数据只存在本机扩展里');
+    } catch (e) { toast('读取剪贴板失败：' + e.message.slice(0, 40)); }
+  }
+
+  /* ================= 悬浮球 + 面板（弹簧动画） ================= */
+  const host = document.createElement('div');
+  host.id = 'sdzk-qf-host';
+  host.style.cssText = 'position:fixed;right:14px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:2147483600;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;';
+  document.documentElement.appendChild(host);
+  const sh = host.attachShadow({ mode: 'closed' });
+
+  const CSS = `
+  :host{all:initial}
+  *{box-sizing:border-box;margin:0;padding:0}
+  .fab{
+    width:56px;height:56px;border-radius:50%;cursor:pointer;user-select:none;
+    background:linear-gradient(145deg,#0a5cc4,#3aa8f0);color:#fff;
+    display:grid;place-items:center;font-size:13px;font-weight:700;line-height:1.15;text-align:center;
+    box-shadow:0 4px 16px rgba(10,92,196,.45), 0 1px 3px rgba(0,0,0,.2);
+    transition:transform .12s cubic-bezier(.2,0,.2,1);
+    will-change:transform;touch-action:none;
+  }
+  .fab:active{transform:scale(.92)}
+  .panel{
+    position:absolute;bottom:64px;right:0;width:264px;
+    background:rgba(250,250,252,.96);backdrop-filter:blur(20px) saturate(180%);
+    border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.22);
+    padding:6px 0 8px;transform-origin:100% 100%;
+    opacity:0;transform:scale(.8) translateY(10px);pointer-events:none;
+    transition:opacity .22s cubic-bezier(.32,.72,0,1), transform .28s cubic-bezier(.32,.72,0,1);
+    will-change:transform,opacity;
+  }
+  .panel.open{opacity:1;transform:none;pointer-events:auto}
+  .hd{font-size:13px;font-weight:700;color:#3c3c43;padding:9px 14px 7px;display:flex;justify-content:space-between;align-items:center}
+  .hd span{font-weight:400;color:#8e8e93;font-size:11px}
+  .sum{margin:0 10px 6px;padding:7px 10px;border-radius:9px;background:rgba(0,122,255,.08);font-size:11px;color:#3c3c43;line-height:1.5}
+  .it{display:flex;align-items:center;gap:9px;padding:9px 14px;font-size:13px;color:#1c1c1e;cursor:pointer;transition:background .12s}
+  .it:hover{background:rgba(0,0,0,.05)}
+  .it:active{background:rgba(0,0,0,.1)}
+  .it svg{width:16px;height:16px;flex:none;opacity:.7}
+  .it .sub{margin-left:auto;font-size:10px;color:#8e8e93}
+  .warn{margin:2px 10px 4px;font-size:10px;line-height:1.5;color:#8e8e93}
+  #tst{position:fixed;left:50%;bottom:88px;transform:translateX(-50%);background:rgba(30,30,32,.92);color:#fff;font-size:12px;padding:8px 14px;border-radius:99px;opacity:0;transition:opacity .25s, transform .3s cubic-bezier(.32,.72,0,1);pointer-events:none;max-width:80vw;text-align:center}
+  #tst.on{opacity:1;transform:translateX(-50%) translateY(-6px)}
+  `;
+  const ico = {
+    fill:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"/><path d="M9 13l2 2l4 -4"/></svg>',
+    up:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v-10"/><path d="M8 11l4 -4l4 4"/><path d="M4 19h16"/></svg>',
+    imp:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"/></svg>',
+    clear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/><path d="M9 7v-3h6v3"/></svg>',
+  };
+  sh.innerHTML = `<style>${CSS}</style>
+    <div class="fab" id="fab">一键<br>填写</div>
+    <div class="panel" id="panel">
+      <div class="hd">报名数据 <span id="sumT"></span></div>
+      <div class="sum" id="sum">未导入</div>
+      <div class="it" id="mImp">${ico.imp}导入面板数据<span class="sub">先在面板点「复制」</span></div>
+      <div class="it" id="mFill">${ico.fill}一键填写表单</div>
+      <div class="it" id="mUp">${ico.up}一键上传照片</div>
+      <div class="it" id="mClr">${ico.clear}清除本机数据</div>
+      <div class="warn">数据仅保存在本机浏览器扩展内，不上传任何服务器。填充后请人工核对再提交。</div>
+    </div>
+    <div id="tst"></div>`;
+
+  const $ = s => sh.getElementById(s);
+  const panel = $('panel'), fab = $('fab'), tst = $('tst');
+  let open = false;
+  function toggle(v) {
+    open = v === undefined ? !open : v;
+    panel.classList.toggle('open', open);
+    renderSummary();
+  }
+  fab.addEventListener('click', e => { e.stopPropagation(); toggle(); });
+  document.addEventListener('click', e => { if (open && !host.contains(e.target)) toggle(false); });
+  function toast(m) { tst.textContent = m; tst.classList.add('on'); clearTimeout(tst._t); tst._t = setTimeout(() => tst.classList.remove('on'), 2600); }
+
+  function renderSummary() {
+    const d = data();
+    const n = ['name', 'idcard', 'phone', 'school', 'qq', 'email', 'address', 'nation', 'politics', 'examType', 'category', 'studentNo', 'nativePlace'].filter(k => d[k]).length;
+    $('sum').textContent = d.name
+      ? `${d.name} ｜ 证件 ${d.idcard ? d.idcard.slice(0, 6) + '****' + d.idcard.slice(-4) : '—'} ｜ ${n} 项${d.photo ? ' ｜ 含照片' : ''}`
+      : '未导入';
+    $('sumT').textContent = 'GM 本机存储';
+  }
+  $('mImp').onclick = () => importFromClipboard();
+  $('mFill').onclick = () => { quickFill(); };
+  $('mUp').onclick = () => quickUpload();
+  $('mClr').onclick = () => { GM_deleteValue('sdzkData'); renderSummary(); toast('已清除'); };
+
+  /* 悬浮球拖拽（1:1 + 橡皮筋吸边） */
+  let drag = null;
+  fab.addEventListener('pointerdown', e => {
+    fab.setPointerCapture(e.pointerId);
+    drag = { x: e.clientX, y: e.clientY, ox: 0, oy: 0, moved: false, hist: [{ x: e.clientX, y: e.clientY, t: performance.now() }] };
+  });
+  fab.addEventListener('pointermove', e => {
+    if (!drag) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (Math.abs(dx) + Math.abs(dy) > 6) drag.moved = true;
+    drag.ox = dx; drag.oy = dy;
+    fab.style.transform = `translate(${dx}px,${dy}px)`;
+    drag.hist.push({ x: e.clientX, y: e.clientY, t: performance.now() });
+    if (drag.hist.length > 5) drag.hist.shift();
+  });
+  const endDrag = e => {
+    if (!drag) return;
+    const h = drag.hist;
+    const a = h[0], b = h[h.length - 1];
+    const dt = Math.max((b.t - a.t) / 1000, 0.001);
+    const vx = (b.x - a.x) / dt, vy = (b.y - a.y) / dt;
+    const d = drag; drag = null;
+    if (!d.moved) { fab.style.transform = ''; return; }   // 是点击，不是拖拽
+    /* 从当前位置弹性吸附到最近的左右边（速度交接 + 欠阻尼回弹） */
+    const rect = fab.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const drift = (vx / 1000) * 0.998 / (1 - 0.998) * 0.35;
+    const targetX = (cx + drift < innerWidth / 2) ? 14 : innerWidth - rect.width - 14;
+    const targetY = Math.max(12, Math.min(innerHeight - rect.height - 12, rect.top + (vy / 1000) * 0.35));
+    const distX = targetX - rect.left, distY = targetY - rect.top;
+    const st = { x: d.ox, y: d.oy, vx: vx / 10, vy: vy / 10 };
+    const w = 2 * Math.PI / 0.38, k = w * w, c = 2 * 0.8 * w, dt2 = 1 / 60;
+    (function anim() {
+      st.vx += (-k * (st.x - distX) - c * st.vx) * dt2;
+      st.vy += (-k * (st.y - distY) - c * st.vy) * dt2;
+      st.x += st.vx * dt2; st.y += st.vy * dt2;
+      fab.style.transform = `translate(${st.x}px,${st.y}px)`;
+      if (Math.hypot(st.x - distX, st.y - distY) > 0.6 || Math.hypot(st.vx, st.vy) > 8) requestAnimationFrame(anim);
+      else { fab.style.transform = ''; positionFab(targetX, targetY); }
+    })();
+  };
+  function positionFab(x, y) {
+    fab.style.transform = '';
+    host.style.right = 'auto';
+    host.style.left = x + 'px';
+    host.style.top = y + 'px';
+    host.style.bottom = 'auto';
+  }
+  fab.addEventListener('pointerup', endDrag);
+  fab.addEventListener('pointercancel', endDrag);
+
+  console.log('[sdzk-quickfill] 就绪：悬浮球已注入');
+})();
