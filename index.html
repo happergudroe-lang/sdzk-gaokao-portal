@@ -311,9 +311,13 @@ footer a{color:var(--blue);text-decoration:none}
 body.xj-lock{overflow:hidden}
 .xj-stage{position:relative;width:100%;height:100%;display:grid;place-items:center;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 .xj-glow{position:absolute;left:50%;top:50%;width:90vmin;height:90vmin;margin:-45vmin 0 0 -45vmin;border-radius:50%;background:radial-gradient(closest-side,rgba(207,169,90,.13),rgba(148,158,178,.09) 45%,rgba(148,158,178,0) 72%);opacity:0;will-change:opacity;pointer-events:none}
-/* V3：权威元素 —— 金印徽记 / 上下鎏金界线 */
-.xj-crest{width:54px;height:54px;margin-bottom:30px;opacity:0;will-change:transform,opacity;pointer-events:none}
-.xj-crest svg{display:block;width:100%;height:100%}
+/* V7：3A 式铭言开场 —— 铭言逐字浮现 → 退场 → 主标题接棒 */
+.xj-head{position:relative;display:flex;flex-direction:column;align-items:center;width:100%}
+.xj-motto{position:absolute;inset:-40px 0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;pointer-events:none}
+.xj-m1,.xj-m2{display:flex;font-family:'Kaiti SC','STKaiti','KaiTi','Songti SC','SimSun',serif;color:#dfe5ee}
+.xj-m1 span,.xj-m2 span{display:block;opacity:0;transform:translateY(14px);will-change:transform,opacity}
+.xj-m1 span{font-size:clamp(30px,9vw,46px);letter-spacing:.22em;margin-right:-.22em;font-weight:600}
+.xj-m2 span{font-size:clamp(22px,6.5vw,34px);letter-spacing:.18em;margin-right:-.18em;font-weight:600;color:#c6cedb}
 .xj-beam{position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(207,169,90,.75) 30%,rgba(207,169,90,.9) 50%,rgba(207,169,90,.75) 70%,transparent);transform:scaleX(0);opacity:0;will-change:transform,opacity;pointer-events:none}
 .xj-beam.t{top:calc(env(safe-area-inset-top,0px) + 34px)}
 .xj-beam.b{bottom:calc(env(safe-area-inset-bottom,0px) + 34px)}
@@ -339,30 +343,22 @@ body.xj-lock{overflow:hidden}
 </head>
 <body>
 
-<!-- 开场动画 V6（低调权威版）：金印徽记 + 项目主标题 + 「小杰 · 技术支持」小字署名，克制的级联节奏（全部类名 xj- 前缀；「开始报名」= 进入主界面） -->
-<div class="xj-splash" id="xjSplash" role="dialog" aria-label="山东高考报名助手 · 小杰提供技术支持">
+<!-- 开场动画 V7（3A 铭言开场）：「乾坤未定 你我皆是黑马」逐字浮现 → 化作定格退场 → 主标题接棒（全部类名 xj- 前缀；「开始报名」= 进入主界面） -->
+<div class="xj-splash" id="xjSplash" role="dialog" aria-label="乾坤未定 你我皆是黑马 · 山东高考报名助手 · 小杰提供技术支持">
   <main class="xj-stage">
     <div class="xj-glow"></div>
     <div class="xj-beam t" aria-hidden="true"></div>
     <div class="xj-beam b" aria-hidden="true"></div>
     <div class="xj-lockup">
-      <div class="xj-crest" aria-hidden="true">
-        <!-- 金印 Logo：双环 + 「杰」字铭文（印章式） -->
-        <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="28" cy="28" r="26.5" stroke="#cfa95a" stroke-opacity=".75" stroke-width="1.2"/>
-          <circle cx="28" cy="28" r="22" stroke="#cfa95a" stroke-opacity=".35" stroke-width="1"/>
-          <circle cx="28" cy="5.5" r="1.3" fill="#cfa95a" fill-opacity=".9"/>
-          <circle cx="50.5" cy="28" r="1.3" fill="#cfa95a" fill-opacity=".9"/>
-          <circle cx="28" cy="50.5" r="1.3" fill="#cfa95a" fill-opacity=".9"/>
-          <circle cx="5.5" cy="28" r="1.3" fill="#cfa95a" fill-opacity=".9"/>
-          <text x="28" y="29.5" text-anchor="middle" dominant-baseline="central"
-                font-family="'Kaiti SC','STKaiti','KaiTi','Songti SC','SimSun',serif"
-                font-size="22" font-weight="700" fill="#cfa95a">杰</text>
-        </svg>
+      <div class="xj-head">
+        <div class="xj-motto" aria-hidden="true">
+          <div class="xj-m1"><span>乾</span><span>坤</span><span>未</span><span>定</span></div>
+          <div class="xj-m2"><span>你</span><span>我</span><span>皆</span><span>是</span><span>黑</span><span>马</span></div>
+        </div>
+        <h1 class="xj-title" aria-label="山东高考报名助手"><span aria-hidden="true">山东高考报名助手</span></h1>
+        <div class="xj-rule"></div>
+        <div class="xj-sub">小杰 · 技术支持</div>
       </div>
-      <h1 class="xj-title" aria-label="山东高考报名助手"><span aria-hidden="true">山东高考报名助手</span></h1>
-      <div class="xj-rule"></div>
-      <div class="xj-sub">小杰 · 技术支持</div>
       <div class="xj-cta">
         <button class="xj-btn" id="xjEnter" type="button">开始报名</button>
         <button class="xj-link xj-replay" type="button">重播开场动画</button>
@@ -381,7 +377,7 @@ body.xj-lock{overflow:hidden}
   var glow = q('.xj-glow'), title = q('.xj-title'), rule = q('.xj-rule'),
       sub = q('.xj-sub'), cta = q('.xj-cta'), note = q('.xj-note'), skip = q('.xj-skip'),
       enter = q('#xjEnter'), replay = q('.xj-replay'),
-      crest = q('.xj-crest'), beamT = q('.xj-beam.t'), beamB = q('.xj-beam.b');
+      motto = q('.xj-motto'), beamT = q('.xj-beam.t'), beamB = q('.xj-beam.b');
   var KEY = 'xj-splash-seen';
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var E1 = 'cubic-bezier(.16,1,.3,1)';
@@ -414,41 +410,54 @@ body.xj-lock{overflow:hidden}
   function play() {
     anims.forEach(function (x) { try { x.cancel(); } catch (e) {} }); anims = [];
     skip.style.display = '';
+    var chars = motto ? [].slice.call(motto.querySelectorAll('span')) : [];
     if (reduce) {
-      [glow, title, sub, cta, note, crest].forEach(function (el) { a(el, [{ opacity: 0 }, { opacity: 1 }], { duration: 400 }); });
+      [glow, title, sub, cta, note].forEach(function (el) { a(el, [{ opacity: 0 }, { opacity: 1 }], { duration: 400 }); });
       [rule, beamT, beamB].forEach(function (el) { a(el, [{ opacity: .5, transform: 'scaleX(1)' }], { duration: 1 }); });
+      if (motto) motto.style.display = 'none';
       skip.style.display = 'none'; return;
     }
-    /* V6 低调权威节奏（有限动画总时长约 2.7s，全程仅 transform/opacity 合成器动画）：
-       界线/光晕(0s) → 徽记(0.3s) → 主标题轻浮起(0.5s) → 金线(1.2s) → 署名(1.45s) → CTA(1.9s) → 底注(2.1s)；
-       光晕与 CTA 之后进入极缓呼吸循环 */
+    motto.style.display = '';
+    /* V7 3A 铭言开场（有限动画总时长约 6.5s，全程仅 transform/opacity 合成器动画）：
+       界线/光晕(0s) → 「乾坤未定」逐字浮现(0.5s) → 「你我皆是黑马」接力(1.6s) → 定格后整句化作光尘退场(4.2s)
+       → 主标题接棒(4.7s) → 金线/署名(5.1s) → CTA(5.7s) → 底注(5.9s)；光晕与 CTA 呼吸循环 */
     a(beamT, [
       { opacity: 0, transform: 'scaleX(0)' },
       { opacity: .45, transform: 'scaleX(1)', offset: .7 },
       { opacity: .3, transform: 'scaleX(1)' }
-    ], { duration: 1000, easing: 'ease-out' });
+    ], { duration: 1100, easing: 'ease-out' });
     a(beamB, [
       { opacity: 0, transform: 'scaleX(0)' },
       { opacity: .45, transform: 'scaleX(1)', offset: .7 },
       { opacity: .3, transform: 'scaleX(1)' }
-    ], { duration: 1000, delay: 120, easing: 'ease-out' });
-    a(glow, [{ opacity: 0 }, { opacity: 1 }], { duration: 1500, easing: 'ease-out' });
+    ], { duration: 1100, delay: 130, easing: 'ease-out' });
+    a(glow, [{ opacity: 0 }, { opacity: 1 }], { duration: 1800, easing: 'ease-out' });
     a(glow, [{ transform: 'scale(1)' }, { transform: 'scale(1.04)' }, { transform: 'scale(1)' }],
-      { duration: 6000, delay: 1500, iterations: Infinity, easing: 'ease-in-out' });
-    a(crest, [
-      { opacity: 0, transform: 'scale(.72)' },
-      { opacity: 1, transform: 'scale(1)' }
-    ], { duration: 600, delay: 300, easing: E1 });
-    a(title, [
-      { opacity: 0, transform: 'translateY(10px)' },
-      { opacity: 1, transform: 'translateY(0)' }
-    ], { duration: 700, delay: 500, easing: E1 });
-    a(rule, [{ opacity: 0, transform: 'scaleX(0)' }, { opacity: 1, transform: 'scaleX(1)' }], { duration: 700, delay: 1200, easing: E1 });
-    a(sub, [{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 650, delay: 1450, easing: E1 });
-    var last = a(cta, [{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 650, delay: 1900, easing: E1 });
+      { duration: 6000, delay: 1800, iterations: Infinity, easing: 'ease-in-out' });
+    /* 铭言：逐字浮现（3A 式缓入） */
+    chars.forEach(function (sp, i) {
+      var lineDelay = i < 4 ? 500 + i * 95 : 1600 + (i - 4) * 95;
+      a(sp, [
+        { opacity: 0, transform: 'translateY(14px) scale(1.04)' },
+        { opacity: 1, transform: 'translateY(0) scale(1)' }
+      ], { duration: 720, delay: lineDelay, easing: E1, fill: 'both' });
+    });
+    /* 定格后整句退场：轻放大 + 淡出（光尘感） */
+    a(motto, [
+      { opacity: 1, transform: 'scale(1)' },
+      { opacity: 0, transform: 'scale(1.035)' }
+    ], { duration: 850, delay: 4200, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'both' });
+    /* 主标题接棒 */
+    var last = a(title, [
+      { opacity: 0, transform: 'translateY(12px) scale(.985)' },
+      { opacity: 1, transform: 'translateY(0) scale(1)' }
+    ], { duration: 700, delay: 4700, easing: E1 });
+    a(rule, [{ opacity: 0, transform: 'scaleX(0)' }, { opacity: 1, transform: 'scaleX(1)' }], { duration: 600, delay: 5100, easing: E1 });
+    a(sub, [{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 600, delay: 5300, easing: E1 });
+    a(cta, [{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 650, delay: 5700, easing: E1 });
     a(cta, [{ transform: 'scale(1)' }, { transform: 'scale(1.012)' }, { transform: 'scale(1)' }],
-      { duration: 5000, delay: 2600, iterations: Infinity, easing: 'ease-in-out' });
-    a(note, [{ opacity: 0 }, { opacity: 1 }], { duration: 550, delay: 2100, easing: 'ease-out' });
+      { duration: 5000, delay: 6400, iterations: Infinity, easing: 'ease-in-out' });
+    a(note, [{ opacity: 0 }, { opacity: 1 }], { duration: 550, delay: 5900, easing: 'ease-out' });
     last.finished.then(function () { skip.style.display = 'none'; }).catch(function () {});
   }
 
