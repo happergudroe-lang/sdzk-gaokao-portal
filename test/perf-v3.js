@@ -10,10 +10,10 @@ const BASE = 'http://127.0.0.1:8971';
   await p1.evaluate(() => {
     window.__frames = 0; window.__long = 0; window.__t0 = performance.now(); window.__last = 0;
     const loop = (t) => { window.__frames++; if (window.__last && t - window.__last > 32) window.__long++; window.__last = t;
-      if (performance.now() - window.__t0 < 3600) requestAnimationFrame(loop); };
+      if (performance.now() - window.__t0 < 34500) requestAnimationFrame(loop); };
     requestAnimationFrame(loop);
   });
-  await p1.waitForTimeout(3400);
+  await p1.waitForTimeout(34800);
   const r1 = await p1.evaluate(() => ({ f: window.__frames, l: window.__long, d: Math.round(performance.now() - window.__t0) }));
   console.log('入场动画: 帧数=' + r1.f, '时长=' + r1.d + 'ms', 'fps≈' + (r1.f / (r1.d / 1000)).toFixed(1), '长帧(>32ms)=' + r1.l);
 
@@ -31,7 +31,7 @@ const BASE = 'http://127.0.0.1:8971';
   /* 第二轮：全新会话截图关键帧 */
   const p2 = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
   await p2.goto(BASE + '/', { waitUntil: 'domcontentloaded' });
-  const shots = [[900, 'v12-converge-early'], [1500, 'v12-converge-mid'], [2100, 'v12-converge-late'], [2800, 'v12-lockup'], [3400, 'v12-full']];
+  const shots = [[2400, 'v3-beams'], [7000, 'v3-crest-title'], [12500, 'v3-sheen'], [17600, 'v3-sub'], [22500, 'v13-campus'], [30000, 'v13-wish'], [34800, 'v3-cta']];
   let prev = 0;
   for (const [ms, name] of shots) {
     await p2.waitForTimeout(ms - prev); prev = ms;
