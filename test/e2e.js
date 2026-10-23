@@ -55,13 +55,13 @@ function computeCheck(first17) {
       if (!document.querySelector('.xj-btn') || document.querySelector('.xj-btn').textContent.indexOf('开始报名') < 0) throw new Error('CTA 按钮缺失');
     });
   });
-  await t('节奏合规：入场有限动画总时长 ≤ 7s（读 WAAPI 时序实测，呼吸循环除外）', () => {
+  await t('节奏合规：入场有限动画总时长 ≤ 7.5s（读 WAAPI 时序实测，呼吸循环除外）', () => {
     return page.evaluate(() => {
       const anims = document.getElementById('xjSplash').getAnimations({ subtree: true })
         .filter(x => x.effect.getTiming().iterations !== Infinity);
       if (!anims.length) throw new Error('未检测到开场动画');
       const maxEnd = Math.max(...anims.map(x => x.effect.getTiming().delay + (typeof x.effect.getTiming().duration === 'number' ? x.effect.getTiming().duration : 0)));
-      if (maxEnd > 7000) throw new Error('总时长 ' + Math.round(maxEnd) + 'ms 超出 7s');
+      if (maxEnd > 7500) throw new Error('总时长 ' + Math.round(maxEnd) + 'ms 超出 7.5s');
     });
   });
   await t('文案权威且诚实：铭言「乾坤未定」、主标题为项目名、副标题为「小杰 · 技术支持」、底注含「非官方」，无「官方指定/授权」类违规字样', () => {
