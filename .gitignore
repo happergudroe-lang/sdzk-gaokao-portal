@@ -1,4 +1,7 @@
 
 
 # project-specific
-3d7ac0a (山东高考报名助手 v5.1.0：零安装纯网站，隐私优先（PIN+AES-GCM 本机存储），8 态官方状态机，提醒中心 + ICS 降级，PWA)
+push-store.json
+_server.log
+node_modules/
+*.bak
