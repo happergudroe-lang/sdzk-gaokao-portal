@@ -55,25 +55,24 @@ function computeCheck(first17) {
       if (!document.querySelector('.xj-btn') || document.querySelector('.xj-btn').textContent.indexOf('开始报名') < 0) throw new Error('CTA 按钮缺失');
     });
   });
-  await t('节奏合规：入场有限动画总时长 ≤ 27s（读 WAAPI 时序实测，呼吸循环除外）', () => {
+  await t('节奏合规：入场有限动画总时长 ≤ 6s（读 WAAPI 时序实测，呼吸循环除外）', () => {
     return page.evaluate(() => {
       const anims = document.getElementById('xjSplash').getAnimations({ subtree: true })
         .filter(x => x.effect.getTiming().iterations !== Infinity);
       if (!anims.length) throw new Error('未检测到开场动画');
       const maxEnd = Math.max(...anims.map(x => x.effect.getTiming().delay + (typeof x.effect.getTiming().duration === 'number' ? x.effect.getTiming().duration : 0)));
-      if (maxEnd > 27000) throw new Error('总时长 ' + Math.round(maxEnd) + 'ms 超出 27s');
+      if (maxEnd > 6000) throw new Error('总时长 ' + Math.round(maxEnd) + 'ms 超出 6s');
     });
   });
-  await t('文案权威且诚实：铭言「乾坤未定」、主标题为项目名、副标题为「小杰 · 技术支持」、底注含「非官方」，无「官方指定/授权」类违规字样', () => {
+  await t('字符汇聚：标题拆为 8 个 .xj-tc 字符、每个有汇聚动画、无铺垫幕残留、文案诚实', () => {
     return page.evaluate(() => {
       const s = document.getElementById('xjSplash');
-      if ((document.querySelector('.xj-tw1').getAttribute('data-text') || '').indexOf('乾坤未定') < 0) throw new Error('打字机主句缺失');
-      if (s.textContent.indexOf('黑马') < 0 && (document.querySelector('.xj-tw1').getAttribute('data-text') || '').indexOf('黑马') < 0) throw new Error('铭言缺失');
-      if (s.textContent.indexOf('三年中专一场空') < 0 || s.textContent.indexOf('开玩笑的') < 0) throw new Error('打工自嘲段缺失');
-      if (s.textContent.indexOf('把选择权拿回自己手里') < 0) throw new Error('鼓励段缺失');
-      if (s.textContent.indexOf('Node.js') < 0 || s.textContent.indexOf('AES-256-GCM') < 0 || s.textContent.indexOf('VAPID') < 0) throw new Error('技术字幕缺失');
-      if (s.textContent.indexOf('小杰科技') < 0 || s.textContent.indexOf('考的都会') < 0 || s.textContent.indexOf('顶峰相见') < 0) throw new Error('祝愿段缺失');
-      if (!document.getElementById('xjCd') || !document.getElementById('xjCdCap')) throw new Error('实时倒计时缺失');
+      const tcs = document.querySelectorAll('.xj-title .xj-tc');
+      if (tcs.length !== 8) throw new Error('标题应拆为 8 个字符 span，实际 ' + tcs.length);
+      let charAnims = 0;
+      tcs.forEach(el => { if (el.getAnimations().length) charAnims++; });
+      if (charAnims < 8) throw new Error('汇聚动画字符数不足: ' + charAnims);
+      if (s.querySelector('.xj-scene') || s.querySelector('.xj-motto') || s.querySelector('.xj-lb') || s.querySelector('.xj-cd')) throw new Error('铺垫幕/黑边/倒计时残留');
       if (document.querySelector('.xj-title').getAttribute('aria-label').indexOf('山东高考报名助手') < 0) throw new Error('主标题缺少项目名');
       if (document.querySelector('.xj-sub').textContent.indexOf('小杰') < 0) throw new Error('副标题缺少技术支持方');
       if (document.querySelector('.xj-note').textContent.indexOf('非官方') < 0) throw new Error('底注缺少非官方声明');

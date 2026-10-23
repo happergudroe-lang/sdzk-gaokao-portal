@@ -311,42 +311,14 @@ footer a{color:var(--blue);text-decoration:none}
 body.xj-lock{overflow:hidden}
 .xj-stage{position:relative;width:100%;height:100%;display:grid;place-items:center;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 .xj-glow{position:absolute;left:50%;top:50%;width:90vmin;height:90vmin;margin:-45vmin 0 0 -45vmin;border-radius:50%;background:radial-gradient(closest-side,rgba(207,169,90,.13),rgba(148,158,178,.09) 45%,rgba(148,158,178,0) 72%);opacity:0;will-change:opacity;pointer-events:none}
-/* V8：3A 电影排版 —— 黑边遮幅 / 竖排铭言（右起）/ 宋体大标题 / 饰线分隔 */
-.xj-lb{position:absolute;left:0;right:0;height:9vh;background:#000;z-index:5;pointer-events:none;will-change:transform}
-.xj-lb::after{content:'';position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(207,169,90,.55) 30%,rgba(207,169,90,.8) 50%,rgba(207,169,90,.55) 70%,transparent)}
-.xj-lb.t{top:0;transform-origin:50% 0}
-.xj-lb.t::after{bottom:0}
-.xj-lb.b{bottom:0;transform-origin:50% 100%}
-.xj-lb.b::after{top:0}
+/* V12：字符汇聚开场 —— 去除全部铺垫幕，标题八字从四周缓缓拼合（Splitting 式拆字 + E1 临界阻尼） */
 .xj-head{position:relative;display:flex;flex-direction:column;align-items:center;width:100%}
-/* V11：三幕序章升级为五幕片头 —— 打工自嘲 → 反转鼓励 → 对联+倒计时 → 技术字幕 → 祝愿 */
-.xj-scene{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(13px,3.2vh,22px);padding:12vh 24px;pointer-events:none}
-.xj-scene p{text-align:center;margin:0;font-family:'Kaiti SC','STKaiti','KaiTi','Songti SC','SimSun',serif;font-size:clamp(14px,3.9vw,20px);font-weight:500;letter-spacing:.12em;margin-right:-.12em;color:#a7b2c3;opacity:0;transform:translateY(10px);will-change:transform,opacity}
-.xj-scene p.em{color:#dfe5ee}
-.xj-scene p.hd{color:var(--xj-gold);font-size:clamp(15px,4vw,22px);letter-spacing:.3em;margin-right:-.3em;font-weight:700;display:flex;align-items:center;gap:10px}
-.xj-scene p.hd svg{width:20px;height:20px;flex:none}
-.xj-scene p.row{font-size:clamp(10.5px,2.8vw,14px);color:#cfd6e0;display:flex;align-items:center;gap:9px;white-space:nowrap;letter-spacing:.03em;margin-right:0;font-family:'SF Mono','Menlo','Consolas',ui-monospace,monospace}
-.xj-scene p.row svg{width:16px;height:16px;flex:none;opacity:.85}
-.xj-scene p.big{font-size:clamp(17px,4.6vw,25px);color:#eef1f6;font-weight:700;letter-spacing:.16em;margin-right:-.16em}
-.xj-pro p.em{color:#dfe5ee}
-.xj-motto{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(15px,3.4vh,26px);padding:10vh 24px;pointer-events:none}
-/* 打字机 + 实时倒计时（居中一栏式，替换原对联） */
-.xj-tw{font-family:'Kaiti SC','STKaiti','KaiTi','Songti SC','SimSun',serif;font-weight:600;color:#dfe5ee;min-height:1.45em;display:flex;align-items:center;justify-content:center;text-align:center}
-.xj-tw1{font-size:clamp(20px,5.6vw,34px);letter-spacing:.08em}
-.xj-tw2{font-size:clamp(14px,3.8vw,20px);letter-spacing:.14em;color:#c6cedb}
-.xj-tw::after{content:'';display:inline-block;width:2px;height:1.02em;background:var(--xj-gold);margin-left:.14em;opacity:0}
-.xj-tw.on::after{opacity:1;animation:xj-blink 1s steps(1) infinite}
-.xj-tw.done::after{animation:xj-blink .7s steps(1) 3 forwards}
-@keyframes xj-blink{0%,55%{opacity:1}56%,100%{opacity:0}}
-.xj-cd{display:flex;flex-direction:column;align-items:center;gap:clamp(8px,1.6vh,12px);opacity:0;transform:translateY(10px);will-change:transform,opacity}
-.xj-cd-cap{font-size:clamp(11px,2.9vw,14px);letter-spacing:.5em;margin-right:-.5em;color:var(--xj-mute)}
-.xj-cd-nums{display:flex;align-items:baseline;gap:clamp(4px,1.2vw,8px)}
-.xj-cd-nums b{font-family:'SF Mono','Menlo','Consolas','Courier New',monospace;font-variant-numeric:tabular-nums;font-size:clamp(26px,7vw,44px);font-weight:700;color:#eef1f6;letter-spacing:.02em}
-.xj-cd-nums i{font-style:normal;font-size:clamp(11px,2.8vw,14px);color:var(--xj-gold);letter-spacing:.1em}
 .xj-eyebrow{font-size:clamp(10px,2.6vw,13px);letter-spacing:.52em;margin-right:-.52em;color:var(--xj-mute);opacity:0;will-change:transform,opacity;margin-bottom:14px}
 .xj-lockup{position:relative;display:flex;flex-direction:column;align-items:center;padding:0 20px;max-width:100vw}
-.xj-title{position:relative;display:flex;justify-content:center;font-family:'Songti SC','STSong','STZhongsong','SimSun',serif;font-size:clamp(30px,8.5vw,64px);font-weight:900;line-height:1.22;letter-spacing:.14em;margin:0;opacity:0;will-change:transform,opacity}
-.xj-title span{color:transparent;background:linear-gradient(180deg,#fff 16%,#9fadc2 100%);-webkit-background-clip:text;background-clip:text;margin-right:-.14em}
+.xj-title{position:relative;display:flex;justify-content:center;font-family:'Songti SC','STSong','STZhongsong','SimSun',serif;font-size:clamp(30px,8.5vw,64px);font-weight:900;line-height:1.22;letter-spacing:.14em;margin:0;will-change:transform}
+.xj-title span{color:transparent;background:linear-gradient(180deg,#fff 16%,#9fadc2 100%);-webkit-background-clip:text;background-clip:text}
+.xj-title span:last-child{margin-right:-.14em}
+.xj-tc{display:inline-block;opacity:0;will-change:transform,opacity}
 .xj-rule{width:min(46vw,210px);height:1px;margin:24px 0 20px;background:linear-gradient(90deg,transparent,var(--xj-gold),transparent);transform:scaleX(0);opacity:0;will-change:transform,opacity;position:relative}
 .xj-rule i{position:absolute;left:50%;top:50%;width:7px;height:7px;background:var(--xj-gold);transform:translate(-50%,-50%) rotate(45deg);opacity:0;will-change:opacity}
 .xj-sub{font-size:clamp(12px,2vw,15px);font-weight:500;letter-spacing:.42em;margin-right:-.42em;color:#8b96a8;opacity:0;will-change:transform,opacity}
@@ -367,58 +339,14 @@ body.xj-lock{overflow:hidden}
 </head>
 <body>
 
-<!-- 开场动画 V7（3A 铭言开场）：「乾坤未定 你我皆是黑马」逐字浮现 → 化作定格退场 → 主标题接棒（全部类名 xj- 前缀；「开始报名」= 进入主界面） -->
-<div class="xj-splash" id="xjSplash" role="dialog" aria-label="乾坤未定 你我皆是黑马 · 山东高考报名助手 · 小杰提供技术支持">
+<!-- 开场动画 V12（字符汇聚）：标题八字从四周缓缓拼合，无铺垫幕，直入主题（全部类名 xj- 前缀；「开始报名」= 进入主界面） -->
+<div class="xj-splash" id="xjSplash" role="dialog" aria-label="山东高考报名助手 · 小杰提供技术支持">
   <main class="xj-stage">
     <div class="xj-glow"></div>
-    <div class="xj-lb t" aria-hidden="true"></div>
-    <div class="xj-lb b" aria-hidden="true"></div>
-    <div class="xj-scene" aria-hidden="true">
-      <p>三年中专一场空，背起书包下广东。</p>
-      <p>男儿立志出关去，电子厂里上夜班。</p>
-      <p>十二小时两班倒，钱少事多还挨叼。</p>
-      <p class="em">……哈哈，开玩笑的。</p>
-    </div>
-    <div class="xj-scene" aria-hidden="true">
-      <p>玩笑归玩笑，路是真的要走的。</p>
-      <p>学历不是唯一的门票，却是最便宜的入场券。</p>
-      <p>二十岁重新洗牌，一点都不晚。</p>
-      <p class="big">这一次，把选择权拿回自己手里。</p>
-    </div>
-    <div class="xj-motto" aria-hidden="true">
-      <div class="xj-tw xj-tw1" data-text="乾坤未定，你我皆是黑马。"></div>
-      <div class="xj-tw xj-tw2" data-text="十年磨剑，今朝试锋芒。"></div>
-      <div class="xj-cd">
-        <div class="xj-cd-cap" id="xjCdCap">距 报名通道开启</div>
-        <div class="xj-cd-nums" id="xjCd"><b>--</b><i>天</i><b>--</b><i>时</i><b>--</b><i>分</i><b>--</b><i>秒</i></div>
-      </div>
-    </div>
-    <div class="xj-scene" aria-hidden="true">
-      <p class="hd">—— 由以下技术驱动 ——</p>
-      <p class="row"><svg viewBox="0 0 24 24" fill="none" stroke="#cfa95a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6l-5 6 5 6"/><path d="M16 6l5 6-5 6"/><path d="M13 5l-2 14"/></svg>前端 · HTML5 / CSS3 / JS / Service Worker / PWA</p>
-      <p class="row"><svg viewBox="0 0 24 24" fill="none" stroke="#cfa95a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="7" rx="1.5"/><rect x="3" y="13" width="18" height="7" rx="1.5"/><path d="M7 7.5h.01M7 16.5h.01"/></svg>后端 · Node.js / Web Push RFC 8291 / VAPID</p>
-      <p class="row"><svg viewBox="0 0 24 24" fill="none" stroke="#cfa95a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M8 11l2.5 2.5L15 9"/><path d="M8 15h8"/></svg>加密 · AES-256-GCM / PBKDF2 / Web Crypto</p>
-      <p class="row"><svg viewBox="0 0 24 24" fill="none" stroke="#cfa95a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/><path d="M9.5 12l1.8 1.8L15 10"/></svg>隐私 · 资料仅存本机 / PIN 锁 / 零第三方追踪</p>
-    </div>
-    <div class="xj-scene" aria-hidden="true">
-      <p class="hd"><svg viewBox="0 0 24 24" fill="none" stroke="#cfa95a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 6.2L21 9l-5 4.4L17.5 20 12 16.5 6.5 20 8 13.4 3 9l6.6-.8z"/></svg>小杰科技 · 祝愿你</p>
-      <p class="big">考的都会，蒙的都对</p>
-      <p class="em">报名顺利，志愿圆满</p>
-      <p>灯火不负赶路人，星光不负追梦者</p>
-      <p class="em">我们，顶峰相见</p>
-    </div>
-    <div class="xj-motto" aria-hidden="true">
-      <div class="xj-tw xj-tw1" data-text="乾坤未定，你我皆是黑马。"></div>
-      <div class="xj-tw xj-tw2" data-text="十年磨剑，今朝试锋芒。"></div>
-      <div class="xj-cd">
-        <div class="xj-cd-cap" id="xjCdCap">距 报名通道开启</div>
-        <div class="xj-cd-nums" id="xjCd"><b>--</b><i>天</i><b>--</b><i>时</i><b>--</b><i>分</i><b>--</b><i>秒</i></div>
-      </div>
-    </div>
     <div class="xj-lockup">
       <div class="xj-head">
         <div class="xj-eyebrow">二〇二七年 · 春季 / 夏季高考</div>
-        <h1 class="xj-title" aria-label="山东高考报名助手"><span aria-hidden="true">山东高考报名助手</span></h1>
+        <h1 class="xj-title" aria-label="山东高考报名助手"><span class="xj-tc" aria-hidden="true">山</span><span class="xj-tc" aria-hidden="true">东</span><span class="xj-tc" aria-hidden="true">高</span><span class="xj-tc" aria-hidden="true">考</span><span class="xj-tc" aria-hidden="true">报</span><span class="xj-tc" aria-hidden="true">名</span><span class="xj-tc" aria-hidden="true">助</span><span class="xj-tc" aria-hidden="true">手</span></h1>
         <div class="xj-rule"><i aria-hidden="true"></i></div>
         <div class="xj-sub">小杰 · 技术支持</div>
       </div>
@@ -440,80 +368,19 @@ body.xj-lock{overflow:hidden}
   var glow = q('.xj-glow'), title = q('.xj-title'), rule = q('.xj-rule'), orn = q('.xj-rule i'),
       sub = q('.xj-sub'), cta = q('.xj-cta'), note = q('.xj-note'), skip = q('.xj-skip'),
       enter = q('#xjEnter'), replay = q('.xj-replay'), eyebrow = q('.xj-eyebrow'),
-      motto = q('.xj-motto'), tw1 = q('.xj-tw1'), tw2 = q('.xj-tw2'),
-      cd = q('.xj-cd'), cdCap = q('#xjCdCap'), cdNums = q('#xjCd'),
-      scenes = [].slice.call(document.querySelectorAll('.xj-scene')),
-      lbT = q('.xj-lb.t'), lbB = q('.xj-lb.b');
+      tcs = [].slice.call(title.querySelectorAll('.xj-tc'));
   var KEY = 'xj-splash-seen';
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var E1 = 'cubic-bezier(.16,1,.3,1)';
-  var timers = [];        /* typewriter / countdown 句柄，skip 与 hide 时统一清理 */
-  var flushers = [];      /* skip 时立即补全文本 */
-  /* 目标时刻：config.json 单一事实源（fillPhase.start），失败回退内置值 */
-  var GATE = Date.parse('2026-10-24T09:00:00+08:00');
-  var GATE_END = Date.parse('2026-10-30T18:00:00+08:00');
-  try {
-    fetch('config.json').then(function (r) { return r.ok ? r.json() : null; }).then(function (c) {
-      if (c && c.fillPhase && c.fillPhase.start) {
-        var t = Date.parse(c.fillPhase.start);
-        if (!isNaN(t)) GATE = t;
-        if (c.fillPhase.end) { var e = Date.parse(c.fillPhase.end); if (!isNaN(e)) GATE_END = e; }
-      }
-    }).catch(function () {});
-  } catch (e) {}
   var anims = [];
 
   function lock(on) { document.body.classList[on ? 'add' : 'remove']('xj-lock'); }
   function a(el, kf, o) { var x = el.animate(kf, Object.assign({ fill: 'both' }, o)); anims.push(x); return x; }
-  function clearTimers() { timers.forEach(function (t) { clearTimeout(t); clearInterval(t); }); timers = []; }
-  /* 打字机：delay 后逐字显示 data-text，金色光标跟随，打完闪三下隐去 */
-  function type(el, delay, speed) {
-    var text = el.getAttribute('data-text') || '';
-    var t = setTimeout(function () {
-      el.classList.add('on');
-      var i = 0;
-      var iv = setInterval(function () {
-        i++;
-        el.textContent = text.slice(0, i);
-        if (i >= text.length) { clearInterval(iv); el.classList.add('done'); }
-      }, speed);
-      timers.push(iv);
-    }, delay);
-    timers.push(t);
-    flushers.push(function () { clearTimeout(t); el.textContent = text; el.classList.add('on', 'done'); });
-  }
-  /* 实时倒计时：每 250ms 刷新（秒级准确），区间感知（开闸前/每日窗口/已开启） */
-  function startCountdown() {
-    function tick() {
-      var now = Date.now();
-      var t = GATE, cap;
-      if (now < GATE) cap = '距 报名通道开启';
-      else if (now > GATE_END) { cap = '报名已截止 · 以官网公告为准'; t = null; }
-      else {
-        var d = new Date(now);
-        var nine = new Date(d); nine.setHours(9, 0, 0, 0);
-        var six = new Date(d); six.setHours(18, 0, 0, 0);
-        if (now < nine) { t = nine.getTime(); cap = '距 今日 09:00 开放'; }
-        else if (now <= six) { cap = '报名通道开启中 · 每天 9:00–18:00'; t = null; }
-        else { var tom = new Date(d); tom.setDate(tom.getDate() + 1); tom.setHours(9, 0, 0, 0); t = tom.getTime(); cap = '距 明日 09:00 开放'; }
-      }
-      cdCap.textContent = cap;
-      var parts = window.SdzkCore && t !== null
-        ? SdzkCore.countdownParts(t, now)
-        : { d: 0, h: 0, m: 0, s: 0, pad: function () { return ['00', '00', '00', '00']; } };
-      var p = parts.pad();
-      var bs = cdNums.querySelectorAll('b');
-      ['天', '时', '分', '秒'].forEach(function (u, i) { bs[i].textContent = p[i]; });
-    }
-    tick();
-    var iv = setInterval(tick, 250);
-    timers.push(iv);
-  }
   function markSeen() { try { sessionStorage.setItem(KEY, '1'); } catch (e) {} }
   function seen() { try { return sessionStorage.getItem(KEY) === '1'; } catch (e) { return false; } }
 
   function hide(instant) {
-    markSeen(); lock(false); clearTimers();
+    markSeen(); lock(false);
     if (instant) {
       splash.style.transition = 'none';
       splash.classList.add('off');
@@ -533,81 +400,44 @@ body.xj-lock{overflow:hidden}
   }
   function play() {
     anims.forEach(function (x) { try { x.cancel(); } catch (e) {} }); anims = [];
-    clearTimers(); flushers = [];
-    [tw1, tw2].forEach(function (el) { el.textContent = ''; el.classList.remove('on', 'done'); });
     skip.style.display = '';
     if (reduce) {
-      [glow, eyebrow, title, sub, cta, note].forEach(function (el) { a(el, [{ opacity: 0 }, { opacity: 1 }], { duration: 400 }); });
+      [glow, eyebrow, sub, cta, note].forEach(function (el) { a(el, [{ opacity: 0 }, { opacity: 1 }], { duration: 400 }); });
       a(rule, [{ opacity: 1, transform: 'scaleX(1)' }], { duration: 1 });
       a(orn, [{ opacity: 1 }], { duration: 1 });
-      if (motto) motto.style.display = 'none';
-      scenes.forEach(function (el) { el.style.display = 'none'; });
-      [lbT, lbB].forEach(function (el) { el.style.display = 'none'; });
+      tcs.forEach(function (el) { a(el, [{ opacity: 0 }, { opacity: 1 }], { duration: 400 }); });
       skip.style.display = 'none'; return;
     }
-    motto.style.display = '';
-    /* V11 五幕片头（有限动画约 19s，全程仅 transform/opacity 合成器动画）：
-       第一幕 打工自嘲(0.8s 起) → 4.6s 退场 | 第二幕 反转鼓励(5.6s 起) → 9.4s 退场
-       第三幕 打字机对联(10.5s/12s) + 实时倒计时(13.4s) → 15.2s 退场
-       第四幕 技术字幕(16.3s 起) → 18.6s 退场 | 第五幕 祝愿(19.7s 起) → 22.4s 退场
-       黑边收开(23.3s) → 标题锁定画面 */
-    a(glow, [{ opacity: 0 }, { opacity: 1 }], { duration: 1800, easing: 'ease-out' });
+    /* V12 字符汇聚（总时长约 3.4s，全程仅 transform/opacity 合成器动画）：
+       glow 氛围 → eyebrow → 八字逐个自四周汇聚拼合（stagger 160ms，E1 临界阻尼）
+       → 饰线/副题 → CTA/注脚，一气呵成直入主题 */
+    a(glow, [{ opacity: 0 }, { opacity: 1 }], { duration: 1600, easing: 'ease-out' });
     a(glow, [{ transform: 'scale(1)' }, { transform: 'scale(1.04)' }, { transform: 'scale(1)' }],
-      { duration: 6000, delay: 1800, iterations: Infinity, easing: 'ease-in-out' });
-    /* 场景通用：子行逐行浮现 → 整场景光尘退场 */
-    function runScene(el, inStart, stagger, exitAt) {
-      var ps = [].slice.call(el.querySelectorAll('p'));
-      ps.forEach(function (p, i) {
-        a(p, [
-          { opacity: 0, transform: 'translateY(10px)' },
-          { opacity: 1, transform: 'translateY(0)' }
-        ], { duration: 850, delay: inStart + i * stagger, easing: E1, fill: 'both' });
-      });
-      a(el, [
-        { opacity: 1, transform: 'scale(1)' },
-        { opacity: 0, transform: 'scale(1.02)' }
-      ], { duration: 700, delay: exitAt, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'both' });
-    }
-    if (scenes[0]) runScene(scenes[0], 800, 800, 4600);    /* 打工自嘲 */
-    if (scenes[1]) runScene(scenes[1], 5600, 700, 9400);   /* 反转鼓励 */
-    /* 第三幕：打字机两行 + 实时倒计时 */
-    type(tw1, 10500, 120);
-    type(tw2, 12000, 120);
-    a(cd, [
-      { opacity: 0, transform: 'translateY(10px)' },
-      { opacity: 1, transform: 'translateY(0)' }
-    ], { duration: 700, delay: 13400, easing: E1, fill: 'both' });
-    startCountdown();
-    a(motto, [
-      { opacity: 1, transform: 'scale(1)' },
-      { opacity: 0, transform: 'scale(1.035)' }
-    ], { duration: 800, delay: 15200, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'both' });
-    /* 第四幕：技术字幕 | 第五幕：祝愿 */
-    if (scenes[2]) runScene(scenes[2], 16300, 450, 19400);
-    if (scenes[3]) runScene(scenes[3], 20200, 500, 23400);
-    /* 黑边收开 + 标题锁定画面 */
-    a(lbT, [{ transform: 'scaleY(1)' }, { transform: 'scaleY(0)' }], { duration: 900, delay: 24250, easing: E1, fill: 'both' });
-    a(lbB, [{ transform: 'scaleY(1)' }, { transform: 'scaleY(0)' }], { duration: 900, delay: 24250, easing: E1, fill: 'both' });
-    a(eyebrow, [{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 600, delay: 25100, easing: E1 });
-    var last = a(title, [
-      { opacity: 0, transform: 'translateY(12px) scale(.985)' },
-      { opacity: 1, transform: 'translateY(0) scale(1)' }
-    ], { duration: 750, delay: 25250, easing: E1 });
-    a(rule, [{ opacity: 0, transform: 'scaleX(0)' }, { opacity: 1, transform: 'scaleX(1)' }], { duration: 600, delay: 25650, easing: E1 });
-    a(orn, [{ opacity: 0 }, { opacity: 1 }], { duration: 400, delay: 25950, easing: 'ease-out' });
-    a(sub, [{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 600, delay: 25800, easing: E1 });
-    a(cta, [{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 650, delay: 26100, easing: E1 });
+      { duration: 6000, delay: 1600, iterations: Infinity, easing: 'ease-in-out' });
+    a(eyebrow, [{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 600, delay: 250, easing: E1 });
+    /* 字符汇聚：左右两端字自外侧滑入、上下交替俯仰，像字母组合一样慢慢拼出 */
+    var last = null;
+    tcs.forEach(function (el, i) {
+      var dx = (i - (tcs.length - 1) / 2) * 34;          /* 左侧字从左来、右侧字从右来 */
+      var dy = (i % 2 ? -1 : 1) * 30;                    /* 上下交替，避免一条直线飞入 */
+      var rot = (i % 2 ? -1 : 1) * 7;                    /* 轻微旋转，落定时归正 */
+      last = a(el, [
+        { opacity: 0, transform: 'translate(' + dx + 'px,' + dy + 'px) rotate(' + rot + 'deg) scale(.72)' },
+        { opacity: 1, transform: 'translate(0,0) rotate(0deg) scale(1)' }
+      ], { duration: 950, delay: 650 + i * 160, easing: E1 });
+    });
+    a(rule, [{ opacity: 0, transform: 'scaleX(0)' }, { opacity: 1, transform: 'scaleX(1)' }], { duration: 600, delay: 2150, easing: E1 });
+    a(orn, [{ opacity: 0 }, { opacity: 1 }], { duration: 400, delay: 2450, easing: 'ease-out' });
+    a(sub, [{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 600, delay: 2300, easing: E1 });
+    a(cta, [{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 650, delay: 2600, easing: E1 });
     a(cta, [{ transform: 'scale(1)' }, { transform: 'scale(1.012)' }, { transform: 'scale(1)' }],
-      { duration: 5000, delay: 26800, iterations: Infinity, easing: 'ease-in-out' });
-    a(note, [{ opacity: 0 }, { opacity: 1 }], { duration: 550, delay: 26300, easing: 'ease-out' });
+      { duration: 5000, delay: 3300, iterations: Infinity, easing: 'ease-in-out' });
+    a(note, [{ opacity: 0 }, { opacity: 1 }], { duration: 550, delay: 2800, easing: 'ease-out' });
     last.finished.then(function () { skip.style.display = 'none'; }).catch(function () {});
   }
 
   skip.addEventListener('click', function () {
-    clearTimers();
-    flushers.forEach(function (f) { f(); }); flushers = [];
     anims.forEach(function (x) { try { x.finish(); } catch (e) {} });
-    [tw1, tw2].forEach(function (el) { el.classList.add('on', 'done'); });
     skip.style.display = 'none'; markSeen();
   });
   replay.addEventListener('click', play);
