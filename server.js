@@ -9,11 +9,24 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const crypto = require('crypto');
 
 const PORT = process.env.PORT || 3000;
 const ROOT = __dirname;
-const STORE = path.join(ROOT, 'push-store.json');
+/* 运行时状态写到项目目录之外：重新部署只覆盖项目目录，homedir 在沙箱内持久，
+   订阅与 VAPID 密钥不会再被部署包里的旧 push-store.json 覆盖（VAPID 变更 = 全部订阅 400）。
+   DATA_DIR 环境变量可供测试注入。 */
+const LEGACY_STORE = path.join(ROOT, 'push-store.json');
+const STORE = process.env.DATA_DIR
+  ? path.join(process.env.DATA_DIR, 'sdzk-push-store.json')
+  : path.join((os.homedir && os.homedir()) || ROOT, 'sdzk-push-store.json');
+try {
+  if (!fs.existsSync(STORE) && fs.existsSync(LEGACY_STORE)) {
+    fs.copyFileSync(LEGACY_STORE, STORE);
+    console.log('[store] 已把旧 push-store.json 迁移到', STORE);
+  }
+} catch (e) {}
 
 /* 开闸时刻 */
 const T_OPEN = new Date('2026-10-24T09:00:00+08:00').getTime();

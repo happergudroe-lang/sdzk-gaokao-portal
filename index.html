@@ -1996,10 +1996,22 @@ async function ncSubscribe(){
     /* 订阅成功立即真发一条测试推送（端到端验证） */
     var t = await fetch('./api/test-push', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ endpoint: sub.endpoint }) });
     var tr = await t.json();
-    say(tr.ok ? '已订阅，测试推送已从服务器发出（看锁屏/通知中心）' : '已订阅，但测试推送失败：' + (tr.error || tr.status));
+    say(tr.ok ? '已订阅，测试推送已从服务器发出（看锁屏/通知中心）' : '已订阅，但测试推送失败：' + (tr.error || tr.err || tr.status));
     haptic();
   }catch(e){ say('订阅失败：' + String(e.message||e).slice(0,50)); }
   renderNC();
+}
+/* 静默重新订阅：服务器侧订阅丢失（部署覆盖/过期清理）时自动修复，用户无感 */
+async function resubscribe(){
+  var reg = await navigator.serviceWorker.ready;
+  var key = await (await fetch('./api/vapid')).json();
+  var old = await reg.pushManager.getSubscription();
+  if (old) { try { await old.unsubscribe(); } catch (e) {} }
+  var sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey: urlB64ToU8(key.publicKey) });
+  var r = await fetch('./api/subscribe', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(sub) });
+  if (!r.ok) throw new Error('服务器拒绝新订阅');
+  myEndpoint = sub.endpoint; pushSubscribed = true; localStorage.setItem('sdzk-push','1'); updNotifyBtn();
+  return sub;
 }
 async function ncTestPush(){
   if (!myEndpoint){
@@ -2014,7 +2026,19 @@ async function ncTestPush(){
   try{
     var r = await fetch('./api/test-push', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ endpoint: myEndpoint }) });
     var j = await r.json();
-    say(j.ok ? '测试推送已发出，检查锁屏/通知中心' : '推送失败：' + (j.error || ('HTTP ' + j.status)));
+    if (j.ok){ say('测试推送已发出，检查锁屏/通知中心'); return; }
+    /* 服务器已不认识该订阅 → 自动重新订阅（拿当前 VAPID 公钥）并重试一次 */
+    if (r.status === 404 || /尚未订阅/.test(j.error || '')){
+      try{
+        var ns = await resubscribe();
+        var r2 = await fetch('./api/test-push', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ endpoint: ns.endpoint }) });
+        var j2 = await r2.json();
+        say(j2.ok ? '订阅已自动修复，测试推送已发出（看锁屏/通知中心）'
+                  : '已重新订阅，但推送仍失败：' + (j2.error || j2.err || ('HTTP ' + j2.status)));
+      }catch(e2){ say('自动重新订阅失败：' + String(e2.message||e2).slice(0,50)); }
+      renderNC(); return;
+    }
+    say('推送失败：' + (j.error || j.err || ('HTTP ' + j.status)));
   }catch(e){ say('请求失败：' + String(e.message||e).slice(0,40)); }
 }
 async function ncUnsubscribe(){
